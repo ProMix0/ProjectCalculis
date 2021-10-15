@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MainLibrary.Interfaces
 {
-    interface IWorkCompiler
+    public interface IWorkCompiler
     {
         Assembly GetAssembly(IWork work);
     }

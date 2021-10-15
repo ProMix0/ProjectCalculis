@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MainLibrary.Interfaces
 {
-    interface IWork
+    public interface IWork
     {
         string Name { get; }
         byte[] WorkCode { get; }

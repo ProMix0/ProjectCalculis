@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MainLibrary.Interfaces
 {
-    interface IRemoteClient
+    public interface IRemoteClient
     {
         WorkRequest OnWorkRequest { set; }
 

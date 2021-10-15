@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace MainLibrary.Interfaces
 {
-    interface IRemoteServer
+    public interface IRemoteServer
     {
         void ConnectTo(string ip, int port);
 
-        IWork GetWork(string workName);
+        Task<IWork> GetWorkAsync(string workName);
     }
 }
