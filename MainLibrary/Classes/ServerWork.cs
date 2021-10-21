@@ -1,4 +1,5 @@
 ﻿using MainLibrary.Interfaces;
+using MessagePack;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace MainLibrary.Classes
 {
+    [MessagePackObject(keyAsPropertyName: true)]
     public class ServerWork : IWork
     {
         public string Name { get; }

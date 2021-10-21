@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MainLibrary.Classes
 {
-    class WorkCompiler : IWorkCompiler
+    public class WorkCompiler : IWorkCompiler
     {
         public Assembly GetAssembly(IWork work)
         {

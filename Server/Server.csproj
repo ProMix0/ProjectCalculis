@@ -5,4 +5,11 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MainLibrary\MainLibrary.csproj" />
+    <ProjectReference Include="..\TestWork\TestWork.csproj">
+      <Private>true</Private>
+    </ProjectReference>
+  </ItemGroup>
+
 </Project>

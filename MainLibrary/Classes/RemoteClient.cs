@@ -1,4 +1,6 @@
 ﻿using MainLibrary.Interfaces;
+using MessagePack;
+using MessagePack.Resolvers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,6 +10,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace MainLibrary.Classes
 {
@@ -16,8 +19,9 @@ namespace MainLibrary.Classes
         public IRemoteClient.WorkRequest OnWorkRequest { set; private get; }
         private Task listenTask;
         private readonly Stream stream;
+        static private XmlSerializer serializer = new(typeof(IWork));
 
-        internal RemoteClient(TcpClient client)
+        public RemoteClient(TcpClient client)
         {
             stream = client.GetStream();
             listenTask = Task.Run(Listen);
@@ -33,11 +37,14 @@ namespace MainLibrary.Classes
                 stream.Read(buffer);
 
                 string name = Encoding.UTF8.GetString(buffer);
-                IWork work=OnWorkRequest?.Invoke(name);
-                buffer =Encoding.UTF8.GetBytes(JsonSerializer.Serialize(work));
-
+                ClientWork work= (ClientWork)(OnWorkRequest?.Invoke(name));
+                //buffer =Encoding.UTF8.GetBytes(JsonSerializer.Serialize(work));
+                buffer = MessagePackSerializer.Serialize(work.GetType(), work, ContractlessStandardResolver.Options);
                 stream.Write(BitConverter.GetBytes(buffer.Length));
                 stream.Write(buffer);
+
+                /*stream.Write(BitConverter.GetBytes(buffer.Length));
+                stream.Write(buffer);*/
             }
         }
     }
