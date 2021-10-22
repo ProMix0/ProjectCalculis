@@ -18,30 +18,36 @@ namespace MainLibrary.Classes
     public class RemoteServer : IRemoteServer
     {
         private Stream stream;
-        private static XmlSerializer serializer = new(typeof(IWork));
+        private BinaryReader reader;
+        private BinaryWriter writer;
 
         public void ConnectTo(IPEndPoint endPoint)
         {
             TcpClient client = new();
             client.Connect(endPoint);
             stream = client.GetStream();
+            reader = new(stream);
+            writer = new(stream);
         } 
 
         public async Task<IWork> GetWorkAsync(string workName)
         {
-            byte[] buffer = Encoding.UTF8.GetBytes(workName);
-            await stream.WriteAsync(BitConverter.GetBytes(buffer.Length));
-            await stream.WriteAsync(buffer);
+            writer.Write(workName);
 
-            buffer = new byte[4];
-            await stream.ReadAsync(buffer);
-            int size = BitConverter.ToInt32(buffer);
-            buffer = new byte[size];
-            await stream.ReadAsync(buffer);
+            DirectoryInfo temp = new(Path.GetTempPath()+workName);
+            temp.Create();
+            int count = reader.ReadInt32();
+            for(int i = 0; i < count; i++)
+            {
+                string name = reader.ReadString();
+                FileInfo file = new(temp + name);
+                using Stream fileStream = file.Create();
+                byte[] buffer = new byte[reader.ReadInt32()];
+                await stream.ReadAsync(buffer);
+                await fileStream.WriteAsync(buffer);
+            }
 
-            return MessagePackSerializer.Deserialize<ClientWork>(buffer, ContractlessStandardResolver.Options);
-
-            /*return MessagePackSerializer.Deserialize<ClientWork>(stream, ContractlessStandardResolver.Options);*/
+            return new Work(workName, temp);
         }
     }
 }

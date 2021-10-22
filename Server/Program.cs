@@ -8,7 +8,7 @@ namespace Server
     {
         static void Main(string[] args)
         {
-            ServerWork work = new("TestWork", "TestWork.exe");
+            Work work = new("TestWork", new(@"D:\Projects\ProjectCalculis\TestWork\bin\Debug\net5.0"));
 
             TcpListener listener = new(System.Net.IPAddress.Loopback, 8008);
             listener.Start();
@@ -16,7 +16,7 @@ namespace Server
             client.OnWorkRequest = name =>
             {
                 Console.WriteLine("Returned work");
-                return new ClientWork(work);
+                return work;
             };
 
             Console.WriteLine("End program");

@@ -19,11 +19,14 @@ namespace MainLibrary.Classes
         public IRemoteClient.WorkRequest OnWorkRequest { set; private get; }
         private Task listenTask;
         private readonly Stream stream;
-        static private XmlSerializer serializer = new(typeof(IWork));
+        private BinaryReader reader;
+        private BinaryWriter writer;
 
         public RemoteClient(TcpClient client)
         {
             stream = client.GetStream();
+            reader = new(stream);
+            writer = new(stream);
             listenTask = Task.Run(Listen);
         }
 
@@ -31,20 +34,18 @@ namespace MainLibrary.Classes
         {
             while (true)
             {
-                byte[] buffer = new byte[4];
-                stream.Read(buffer);
-                buffer = new byte[BitConverter.ToInt32(buffer)];
-                stream.Read(buffer);
+                string name = reader.ReadString();
+                IWork work= OnWorkRequest?.Invoke(name);
 
-                string name = Encoding.UTF8.GetString(buffer);
-                ClientWork work= (ClientWork)(OnWorkRequest?.Invoke(name));
-                //buffer =Encoding.UTF8.GetBytes(JsonSerializer.Serialize(work));
-                buffer = MessagePackSerializer.Serialize(work.GetType(), work, ContractlessStandardResolver.Options);
-                stream.Write(BitConverter.GetBytes(buffer.Length));
-                stream.Write(buffer);
-
-                /*stream.Write(BitConverter.GetBytes(buffer.Length));
-                stream.Write(buffer);*/
+                List<FileInfo> files = work.AssemblyDirectory.EnumerateFiles("*", SearchOption.AllDirectories).ToList();
+                writer.Write(files.Count);
+                foreach(var file in files)
+                {
+                    writer.Write(file.FullName.Substring(work.AssemblyDirectory.FullName.Length));
+                    using Stream stream = file.OpenRead();
+                    writer.Write(stream.Length);
+                    stream.CopyTo(this.stream);
+                }
             }
         }
     }
