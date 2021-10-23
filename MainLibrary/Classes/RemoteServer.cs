@@ -35,14 +35,17 @@ namespace MainLibrary.Classes
             writer.Write(workName);
 
             DirectoryInfo temp = new(Path.GetTempPath()+workName);
-            temp.Create();
             int count = reader.ReadInt32();
             for(int i = 0; i < count; i++)
             {
                 string name = reader.ReadString();
+                Console.WriteLine(name);
                 FileInfo file = new(temp + name);
+                file.Directory.Create();
                 using Stream fileStream = file.Create();
                 byte[] buffer = new byte[reader.ReadInt32()];
+                reader.BaseStream.Read(new byte[4]);
+                Console.WriteLine(buffer.Length);
                 await stream.ReadAsync(buffer);
                 await fileStream.WriteAsync(buffer);
             }

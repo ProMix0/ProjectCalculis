@@ -24,7 +24,8 @@ namespace MainLibrary.Classes
 
         public void Execute(object[] args)
         {
-            Assembly assembly = Assembly.Load(AssemblyDirectory.EnumerateFiles($"{Name}.exe").First().FullName);
+            string fullName = AssemblyDirectory.EnumerateFiles($"{Name}.dll").First().FullName;
+            Assembly assembly = Assembly.LoadFile(fullName);
             assembly.EntryPoint.Invoke(null, args);
         }
     }

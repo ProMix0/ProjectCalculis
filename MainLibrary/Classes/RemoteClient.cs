@@ -32,20 +32,29 @@ namespace MainLibrary.Classes
 
         private void Listen()
         {
-            while (true)
+            try
             {
-                string name = reader.ReadString();
-                IWork work= OnWorkRequest?.Invoke(name);
-
-                List<FileInfo> files = work.AssemblyDirectory.EnumerateFiles("*", SearchOption.AllDirectories).ToList();
-                writer.Write(files.Count);
-                foreach(var file in files)
+                while (true)
                 {
-                    writer.Write(file.FullName.Substring(work.AssemblyDirectory.FullName.Length));
-                    using Stream stream = file.OpenRead();
-                    writer.Write(stream.Length);
-                    stream.CopyTo(this.stream);
+                    string name = reader.ReadString();
+                    IWork work = OnWorkRequest?.Invoke(name);
+
+                    List<FileInfo> files = work.AssemblyDirectory.EnumerateFiles("*", SearchOption.AllDirectories).ToList();
+                    writer.Write(files.Count);
+                    foreach (var file in files)
+                    {
+                        writer.Write(file.FullName[work.AssemblyDirectory.FullName.Length..]);
+                        Console.WriteLine(file.FullName[work.AssemblyDirectory.FullName.Length..]);
+                        using Stream fileStream = file.OpenRead();
+                        writer.Write(fileStream.Length);
+                        Console.WriteLine(fileStream.Length);
+                        fileStream.CopyTo(stream);
+                    }
                 }
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
             }
         }
     }
