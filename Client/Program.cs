@@ -13,7 +13,7 @@ namespace Client
             IRemoteServer server = new RemoteServer();
             server.ConnectTo(new(IPAddress.Loopback, 8008));
             IWork work = server.GetWorkAsync("TestWork").Result;
-            work.Execute(new object[] { new string[0]});
+            work.Execute(new object[] { Array.Empty<string>() });
         }
     }
 }

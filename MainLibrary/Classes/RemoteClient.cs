@@ -44,10 +44,10 @@ namespace MainLibrary.Classes
                     foreach (var file in files)
                     {
                         writer.Write(file.FullName[work.AssemblyDirectory.FullName.Length..]);
-                        Console.WriteLine(file.FullName[work.AssemblyDirectory.FullName.Length..]);
+                        //Console.WriteLine(file.FullName[work.AssemblyDirectory.FullName.Length..]);
                         using Stream fileStream = file.OpenRead();
                         writer.Write(fileStream.Length);
-                        Console.WriteLine(fileStream.Length);
+                        //Console.WriteLine(fileStream.Length);
                         fileStream.CopyTo(stream);
                     }
                 }
