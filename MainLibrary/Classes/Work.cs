@@ -22,11 +22,14 @@ namespace MainLibrary.Classes
             AssemblyDirectory = directory;
         }
 
-        public void Execute(object[] args)
+        public Task Execute(object[] args)
         {
-            string fullName = AssemblyDirectory.EnumerateFiles($"{Name}.dll").First().FullName;
-            Assembly assembly = Assembly.LoadFile(fullName);
-            assembly.EntryPoint.Invoke(null, args);
+            return Task.Run(() =>
+            {
+                string fullName = AssemblyDirectory.EnumerateFiles($"{Name}.dll").First().FullName;
+                Assembly assembly = Assembly.LoadFile(fullName);
+                assembly.EntryPoint.Invoke(null, args);
+            });
         }
     }
 }
