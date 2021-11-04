@@ -13,6 +13,6 @@ namespace MainLibrary.Interfaces
     {
         string Name { get; }
         DirectoryInfo AssemblyDirectory { get; }
-        void Execute(object[] args);
+        Task Execute(object[] args);
     }
 }
