@@ -28,26 +28,29 @@ namespace MainLibrary.Classes
             stream = client.GetStream();
             reader = new(stream);
             writer = new(stream);
-        } 
+        }
 
         public async Task<IWork> GetWorkAsync(string workName)
         {
             writer.Write(workName);
 
-            DirectoryInfo temp = new(Path.GetTempPath()+workName);
+            DirectoryInfo temp = new(Path.GetTempPath() + workName);
             int count = reader.ReadInt32();
-            for(int i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
                 string name = reader.ReadString();
-                //Console.WriteLine(name);
-                FileInfo file = new(temp + name);
+                //Console.WriteLine($"Name: {name}, legth: {name.Length}");
+
+                int size = reader.ReadInt32();
+                //Console.WriteLine(size);
+
+                FileInfo file = new(temp.FullName + name);
                 file.Directory.Create();
+                byte[] data = reader.ReadBytes(size);
                 using Stream fileStream = file.Create();
-                byte[] buffer = new byte[reader.ReadInt32()];
-                reader.BaseStream.Read(new byte[4]);
-                //Console.WriteLine(buffer.Length);
-                await stream.ReadAsync(buffer);
-                await fileStream.WriteAsync(buffer);
+                await fileStream.WriteAsync(data);
+
+                reader.ReadBytes(4);
             }
 
             return new Work(workName, temp);

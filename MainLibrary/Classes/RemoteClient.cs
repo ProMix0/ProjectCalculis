@@ -45,10 +45,12 @@ namespace MainLibrary.Classes
                     {
                         writer.Write(file.FullName[work.AssemblyDirectory.FullName.Length..]);
                         //Console.WriteLine(file.FullName[work.AssemblyDirectory.FullName.Length..]);
-                        using Stream fileStream = file.OpenRead();
-                        writer.Write(fileStream.Length);
-                        //Console.WriteLine(fileStream.Length);
-                        fileStream.CopyTo(stream);
+
+                        writer.Write(file.Length);
+                        //Console.WriteLine(file.Length);
+
+                        byte[] data = File.ReadAllBytes(file.FullName);
+                        writer.Write(data);
                     }
                 }
             }
