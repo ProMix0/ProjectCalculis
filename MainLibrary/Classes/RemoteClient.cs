@@ -44,10 +44,8 @@ namespace MainLibrary.Classes
                     foreach (var file in files)
                     {
                         writer.Write(file.FullName[work.AssemblyDirectory.FullName.Length..]);
-                        //Console.WriteLine(file.FullName[work.AssemblyDirectory.FullName.Length..]);
 
-                        writer.Write(file.Length);
-                        //Console.WriteLine(file.Length);
+                        writer.Write((int)file.Length);
 
                         byte[] data = File.ReadAllBytes(file.FullName);
                         writer.Write(data);

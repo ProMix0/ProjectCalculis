@@ -14,9 +14,6 @@ namespace Client
     {
         static async Task Main(string[] args)
         {
-            Console.WriteLine(BitConverter.ToInt32(Encoding.UTF8.GetBytes("0тd ")));
-            foreach (byte b in Encoding.UTF8.GetBytes(@"Ї  "))
-                Console.WriteLine(b);
             await new HostBuilder()
                 .ConfigureServices(services =>
                 {
