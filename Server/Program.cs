@@ -1,27 +1,33 @@
 ﻿using MainLibrary.Classes;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System;
+using System.Configuration;
+using System.IO;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace Server
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            /*Work work = new("TestWork", new(@"D:\Projects\ProjectCalculis\TestWork\bin\Debug\net5.0"));*/
-            Work work = new("TestWork", new(@"C:\Users\Ученик\source\repos\ProjectCalculis\TestWork\bin\Debug\net5.0"));
-
-            TcpListener listener = new(System.Net.IPAddress.Loopback, 8008);
-            listener.Start();
-            RemoteClient client = new(listener.AcceptTcpClient());
-            client.OnWorkRequest = name =>
-            {
-                Console.WriteLine("Returned work");
-                return work;
-            };
-
-            Console.WriteLine("End program");
-            Console.ReadLine();
+            IHostBuilder builder = new HostBuilder();
+            await builder
+                .ConfigureAppConfiguration(configHost=>
+                {
+                    configHost.SetBasePath(Directory.GetCurrentDirectory());
+                    configHost.AddJsonFile("settings.json", optional: false);
+                    configHost.AddCommandLine(args);
+                })
+                .ConfigureServices((context,services )=>
+                {
+                    services.Configure<PathOptions>(context.Configuration.GetSection(PathOptions.Path));
+                    services.AddHostedService<Worker>();
+                })
+                .RunConsoleAsync();
         }
     }
 }
