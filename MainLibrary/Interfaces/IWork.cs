@@ -12,6 +12,7 @@ namespace MainLibrary.Interfaces
     public interface IWork
     {
         string Name { get; }
+        IWorkMetadata Metadata { get; }
         DirectoryInfo AssemblyDirectory { get; }
         Task Execute(object[] args);
     }

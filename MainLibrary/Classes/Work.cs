@@ -16,6 +16,17 @@ namespace MainLibrary.Classes
 
         public DirectoryInfo AssemblyDirectory { get; }
 
+        public IWorkMetadata Metadata
+        {
+            get
+            {
+                if (metadata == null)
+                    metadata = new WorkMetadata(this);
+                return metadata;
+            }
+        }
+        private IWorkMetadata metadata;
+
         public Work(string name, DirectoryInfo directory)
         {
             Name = name;
