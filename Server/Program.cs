@@ -16,15 +16,16 @@ namespace Server
         {
             IHostBuilder builder = new HostBuilder();
             await builder
-                .ConfigureAppConfiguration(configHost=>
+                .ConfigureAppConfiguration(configHost =>
                 {
                     configHost.SetBasePath(Directory.GetCurrentDirectory());
                     configHost.AddJsonFile("settings.json", optional: false);
                     configHost.AddCommandLine(args);
                 })
-                .ConfigureServices((context,services )=>
+                .ConfigureServices((context, services) =>
                 {
                     services.Configure<PathOptions>(context.Configuration.GetSection(PathOptions.Path));
+                    services.Configure<Options>(context.Configuration);
                     services.AddHostedService<Worker>();
                 })
                 .RunConsoleAsync();

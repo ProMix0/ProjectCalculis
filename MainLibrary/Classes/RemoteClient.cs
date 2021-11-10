@@ -16,7 +16,8 @@ namespace MainLibrary.Classes
 {
     public class RemoteClient : IRemoteClient
     {
-        public IRemoteClient.WorkRequest OnWorkRequest { set; private get; }
+        public IRemoteClient.WorkRequest GetWork { set; private get; }
+        public IRemoteClient.WorksListRequest GetWorksList { set; private get; }
         private Task listenTask;
         private readonly Stream stream;
         private BinaryReader reader;
@@ -37,7 +38,22 @@ namespace MainLibrary.Classes
                 while (true)
                 {
                     string name = reader.ReadString();
-                    IWork work = OnWorkRequest?.Invoke(name);
+
+                    if(name.Equals("GET works"))
+                    {
+                        List<IWork> list = GetWorksList?.Invoke();
+                        writer.Write(list.Count);
+                        foreach (var workToSend in list)
+                        {
+                            IWorkMetadata metadata = workToSend.Metadata;
+                            writer.Write(metadata.Name);
+                            writer.Write((int)metadata.AssemblyHash.Length);
+                            writer.Write(metadata.AssemblyHash);
+                        }
+                        continue;
+                    }
+
+                    IWork work = GetWork?.Invoke(name);
 
                     List<FileInfo> files = work.AssemblyDirectory.EnumerateFiles("*", SearchOption.AllDirectories).ToList();
                     writer.Write(files.Count);

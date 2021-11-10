@@ -1,4 +1,5 @@
 ﻿using MainLibrary.Interfaces;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -21,8 +22,9 @@ namespace MainLibrary.Classes
             writer = new(stream);
         }
 
-        public async Task<IWork> GetWorkAsync(string workName)
+        public async Task<IWork> GetWorkAsync(IWorkMetadata workMetadata)
         {
+            string workName = workMetadata.Name;
             writer.Write(workName);
 
             DirectoryInfo temp = new(Path.GetTempPath() + workName);
@@ -41,6 +43,20 @@ namespace MainLibrary.Classes
             }
 
             return new Work(workName, temp);
+        }
+
+        public Task<List<IWorkMetadata>> GetWorksListAsync()
+        {
+            writer.Write("GET works");
+            int count = reader.ReadInt32();
+            List<IWorkMetadata> result = new();
+            for(int i = 0; i < count; i++)
+            {
+                string name = reader.ReadString();
+                byte[] hash = reader.ReadBytes(reader.ReadInt32());
+                result.Add(new WorkMetadata(name, hash));
+            }
+            return Task.FromResult(result);
         }
     }
 }

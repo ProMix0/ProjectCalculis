@@ -8,8 +8,9 @@ namespace MainLibrary.Interfaces
 {
     public interface IRemoteClient
     {
-        WorkRequest OnWorkRequest { set; }
+        WorkRequest GetWork { set; }
 
         delegate IWork WorkRequest(string workName);
+        delegate List<IWork> WorksListRequest();
     }
 }

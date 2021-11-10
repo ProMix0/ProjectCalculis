@@ -17,7 +17,8 @@ namespace Client
         {
             IRemoteServer server = new RemoteServer();
             server.ConnectTo(new(IPAddress.Loopback, 8008));
-            IWork work = await server.GetWorkAsync("TestWork");
+            List<IWorkMetadata> works = await server.GetWorksListAsync();
+            IWork work = await server.GetWorkAsync(works.First());
             await work.Execute(new object[] { Array.Empty<string>() });
         }
 

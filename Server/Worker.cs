@@ -1,9 +1,11 @@
 ﻿using MainLibrary.Classes;
+using MainLibrary.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -15,6 +17,7 @@ namespace Server
     class Worker : IHostedService
     {
         private PathOptions path;
+        private List<IWork> works = new();
 
         public Worker(IOptions<PathOptions> path)
         {
@@ -23,7 +26,15 @@ namespace Server
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            Work work = new("TestWork", new(path.WorksDirectory));
+
+            foreach (var work in Directory.EnumerateDirectories(path.WorksDirectory, "*", SearchOption.TopDirectoryOnly))
+            {
+                DirectoryInfo directory = new(work);
+                works.Add(new Work(directory.Name, directory));
+            }
+            works.Sort((x,y)=>x.Name.CompareTo(y.Name));
+
+            //Work work = new("TestWork", new(path.WorksDirectory));
             //Work work = new("TestWork", new(@"D:\Projects\ProjectCalculis\TestWork\bin\Debug\net5.0"));
             //Work work = new("TestWork", new(@"C:\Users\Ученик\source\repos\ProjectCalculis\TestWork\bin\Debug\net5.0"));
 
@@ -34,10 +45,11 @@ namespace Server
                     while (true)
                     {
                         RemoteClient client = new(listener.AcceptTcpClient());
-                        client.OnWorkRequest = name =>
+                        client.GetWorksList = () => works;
+                        client.GetWork = name =>
                         {
                             Console.WriteLine("Returned work");
-                            return work;
+                            return works.Find(work=>work.Name.Equals(name));
                         };
                     }
                 }, cancellationToken);

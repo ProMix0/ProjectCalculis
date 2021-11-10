@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client", "Client\Client.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "Server\Server.csproj", "{70466EA0-5C5D-4409-AE5A-44B1E5C0FDFF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestWork", "TestWork\TestWork.csproj", "{6F7CFD43-C297-4A8B-A825-A3B61FABB0C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestWork", "TestWork\TestWork.csproj", "{6F7CFD43-C297-4A8B-A825-A3B61FABB0C2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

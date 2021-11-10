@@ -11,6 +11,8 @@ namespace MainLibrary.Interfaces
     {
         void ConnectTo(IPEndPoint endPoint);
 
-        Task<IWork> GetWorkAsync(string workName);
+        Task<List<IWorkMetadata>> GetWorksListAsync();
+
+        Task<IWork> GetWorkAsync(IWorkMetadata workMetadata);
     }
 }
