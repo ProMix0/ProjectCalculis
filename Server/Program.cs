@@ -18,15 +18,17 @@ namespace Server
             await builder
                 .ConfigureAppConfiguration(configHost =>
                 {
-                    configHost.SetBasePath(Directory.GetCurrentDirectory());
-                    configHost.AddJsonFile("settings.json", optional: false);
-                    configHost.AddCommandLine(args);
+                    configHost
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("settings.json", optional: false)
+                    .AddCommandLine(args);
                 })
                 .ConfigureServices((context, services) =>
                 {
-                    services.Configure<PathOptions>(context.Configuration.GetSection(PathOptions.Path));
-                    services.Configure<Options>(context.Configuration);
-                    services.AddHostedService<Worker>();
+                    services
+                    .Configure<PathOptions>(context.Configuration.GetSection(PathOptions.Path))
+                    .Configure<Options>(context.Configuration)
+                    .AddHostedService<Worker>();
                 })
                 .RunConsoleAsync();
         }

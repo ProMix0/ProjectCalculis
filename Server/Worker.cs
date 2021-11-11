@@ -34,10 +34,6 @@ namespace Server
             }
             works.Sort((x, y) => x.Name.CompareTo(y.Name));
 
-            //Work work = new("TestWork", new(path.WorksDirectory));
-            //Work work = new("TestWork", new(@"D:\Projects\ProjectCalculis\TestWork\bin\Debug\net5.0"));
-            //Work work = new("TestWork", new(@"C:\Users\Ученик\source\repos\ProjectCalculis\TestWork\bin\Debug\net5.0"));
-
             TcpListener listener = new(System.Net.IPAddress.Loopback, 8008);
             listener.Start();
             return Task.Run(() =>
