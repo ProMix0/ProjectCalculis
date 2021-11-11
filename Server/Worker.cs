@@ -24,7 +24,7 @@ namespace Server
             this.path = path.Value;
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
             foreach (var directory in path.WorksDirectories.Select(fullPath => new DirectoryInfo(fullPath)))
             {
@@ -36,19 +36,17 @@ namespace Server
 
             TcpListener listener = new(System.Net.IPAddress.Loopback, 8008);
             listener.Start();
-            return Task.Run(() =>
+            while (true)
+            {
+                RemoteClient client = new(await listener.AcceptTcpClientAsync());
+                client.GetWorksList = () => works;
+                client.GetWork = name =>
                 {
-                    while (true)
-                    {
-                        RemoteClient client = new(listener.AcceptTcpClient());
-                        client.GetWorksList = () => works;
-                        client.GetWork = name =>
-                        {
-                            Console.WriteLine("Returned work");
-                            return works.Find(work => work.Name.Equals(name));
-                        };
-                    }
-                }, cancellationToken);
+                    Console.WriteLine("Returned work");
+                    return works.Find(work => work.Name.Equals(name));
+                };
+            };
+
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
