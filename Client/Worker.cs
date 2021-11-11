@@ -25,7 +25,6 @@ namespace Client
         public Task StopAsync(CancellationToken cancellationToken)
         {
             return Task.CompletedTask;
-            //throw new NotImplementedException();
         }
     }
 }

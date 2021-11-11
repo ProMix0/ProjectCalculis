@@ -21,14 +21,16 @@ namespace Client
             await new HostBuilder()
                 .ConfigureAppConfiguration(configHost =>
                 {
-                    configHost.SetBasePath(Directory.GetCurrentDirectory());
-                    //configHost.AddInMemoryCollection(new Dictionary<string, string>() { { } });
-                    configHost.AddJsonFile(GetFolderPath(SpecialFolder.ApplicationData)+@"\ProjectCalculis\settings.json", optional: true);
-                    configHost.AddCommandLine(args);
+                    configHost
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    //.AddInMemoryCollection(new Dictionary<string, string>() { { } })
+                    .AddJsonFile(GetFolderPath(SpecialFolder.ApplicationData)+@"\ProjectCalculis\settings.json", optional: true)
+                    .AddCommandLine(args);
                 })
                 .ConfigureServices(services =>
                 {
-                    services.AddHostedService<Worker>();
+                    services
+                    .AddHostedService<Worker>();
                 })
                 .RunConsoleAsync();
         }
