@@ -23,13 +23,15 @@ namespace Client
                 {
                     configHost
                     .SetBasePath(Directory.GetCurrentDirectory())
-                    //.AddInMemoryCollection(new Dictionary<string, string>() { { } })
-                    .AddJsonFile(GetFolderPath(SpecialFolder.ApplicationData)+@"\ProjectCalculis\settings.json", optional: true)
+                    .AddInMemoryCollection(new Dictionary<string, string>() { { "Path:WorksDirectory", $@"{GetFolderPath(SpecialFolder.ApplicationData)}\ProjectCalculis\Works" } })
+                    .AddJsonFile(GetFolderPath(SpecialFolder.ApplicationData) + @"\ProjectCalculis\settings.json", optional: true)
                     .AddCommandLine(args);
                 })
-                .ConfigureServices(services =>
+                .ConfigureServices((context, services) =>
                 {
                     services
+                    .Configure<PathOptions>(context.Configuration.GetSection(PathOptions.Path))
+                    .Configure<Options>(context.Configuration)
                     .AddHostedService<Worker>();
                 })
                 .RunConsoleAsync();
