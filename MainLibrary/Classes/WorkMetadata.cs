@@ -15,7 +15,7 @@ namespace MainLibrary.Classes
 
         public byte[] AssemblyHash { get; private set; }
 
-        internal WorkMetadata(string name,byte[] assemblyHash)
+        internal WorkMetadata(string name, byte[] assemblyHash)
         {
             Name = name;
             AssemblyHash = assemblyHash;
@@ -24,14 +24,21 @@ namespace MainLibrary.Classes
         public WorkMetadata(IWork work)
         {
             Name = work.Name;
-            List<byte> hash = new();
-            SHA256Managed sha = new();
-            foreach(var file in work.AssemblyDirectory.EnumerateFiles("*", SearchOption.AllDirectories))
+            AssemblyHash = work.CalculateHash();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if(obj is IWorkMetadata metadata)
             {
-                using Stream stream = file.OpenRead();
-                hash.AddRange(sha.ComputeHash(stream));
+                if (AssemblyHash.Length != metadata.AssemblyHash.Length) return false;
+                for(int i = 0; i < AssemblyHash.Length; i++)
+                {
+                    if (AssemblyHash[i] != metadata.AssemblyHash[i]) return false;
+                }
+                return true;
             }
-            AssemblyHash = hash.ToArray();
+            return base.Equals(obj);
         }
     }
 }

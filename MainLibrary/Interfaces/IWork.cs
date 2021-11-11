@@ -15,5 +15,6 @@ namespace MainLibrary.Interfaces
         IWorkMetadata Metadata { get; }
         DirectoryInfo AssemblyDirectory { get; }
         Task Execute(object argsObject);
+        byte[] CalculateHash();
     }
 }

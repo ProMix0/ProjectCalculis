@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -45,6 +46,28 @@ namespace MainLibrary.Classes
                     instance.Entrypoint(argsObject);
                 }
             });
+        }
+
+        public byte[] CalculateHash()
+        {
+            List<byte> hash = new();
+            SHA256Managed sha = new();
+            foreach (var file in AssemblyDirectory.EnumerateFiles("*", SearchOption.AllDirectories))
+            {
+                using Stream stream = file.OpenRead();
+                hash.AddRange(sha.ComputeHash(stream));
+            }
+            return hash.ToArray();
+        }
+
+        public static List<IWork> CreateWorksFrom(string path)
+        {
+            Directory.CreateDirectory(path);
+            return Directory.EnumerateDirectories(path, "*", SearchOption.TopDirectoryOnly).Select(folder =>
+              {
+                  DirectoryInfo directory = new(folder);
+                  return new Work(directory.Name, directory);
+              }).Cast<IWork>().ToList();
         }
     }
 }
