@@ -31,11 +31,9 @@ namespace MainLibrary.Classes
             Rijndael rijndael = Rijndael.Create();
             rijndael.Key = new byte[] { 23, 165, 58, 170, 51, 13, 69, 79, 6, 198, 166, 113, 183, 72, 235, 83, 82, 185, 45, 226, 243, 251, 169, 120, 49, 149, 31, 42, 152, 77, 245, 120 };
             rijndael.IV = new byte[] { 196, 55, 81, 107, 226, 189, 74, 184, 9, 69, 91, 21, 103, 45, 208, 210 };
-            CryptoStream readStream = new(stream, rijndael.CreateDecryptor(), CryptoStreamMode.Read);
-            CryptoStream writeStream = new(stream, rijndael.CreateEncryptor(), CryptoStreamMode.Write);
 
-            reader = new(readStream);
-            writer = new(writeStream);
+            reader = new CryptoBinaryReader(stream, rijndael.CreateDecryptor());
+            writer = new CryptoBinaryWriter(stream, rijndael.CreateEncryptor());
             listenTask = Task.Run(Listen);
         }
 
@@ -45,8 +43,8 @@ namespace MainLibrary.Classes
             {
                 while (true)
                 {
-                    while (true)
-                        Console.WriteLine(reader.ReadByte());
+                    //while (true)
+                    //    Console.WriteLine(reader.ReadByte());
 
                     string name = reader.ReadString();
 

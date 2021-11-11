@@ -24,11 +24,9 @@ namespace MainLibrary.Classes
             Rijndael rijndael = Rijndael.Create();
             rijndael.Key = new byte[] { 23, 165, 58, 170, 51, 13, 69, 79, 6, 198, 166, 113, 183, 72, 235, 83, 82, 185, 45, 226, 243, 251, 169, 120, 49, 149, 31, 42, 152, 77, 245, 120 };
             rijndael.IV = new byte[] { 196, 55, 81, 107, 226, 189, 74, 184, 9, 69, 91, 21, 103, 45, 208, 210 };
-            CryptoStream readStream = new(stream, rijndael.CreateDecryptor(), CryptoStreamMode.Read, true);
-            CryptoStream writeStream = new(stream, rijndael.CreateEncryptor(), CryptoStreamMode.Write, true);
 
-            reader = new(readStream);
-            writer = new(writeStream);
+            reader = new CryptoBinaryReader(stream, rijndael.CreateDecryptor());
+            writer = new CryptoBinaryWriter(stream, rijndael.CreateEncryptor());
         }
 
         public async Task<IWork> DownloadWorkAsync(IWorkMetadata workMetadata, DirectoryInfo worksDirectory)
@@ -57,7 +55,6 @@ namespace MainLibrary.Classes
         public Task<List<IWorkMetadata>> GetWorksListAsync()
         {
             writer.Write("GET works");
-            writer.BaseStream.Dispose();
 
             int count = reader.ReadInt32();
             List<IWorkMetadata> result = new();
