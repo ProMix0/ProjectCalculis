@@ -33,13 +33,17 @@ namespace MainLibrary.Classes
             AssemblyDirectory = directory;
         }
 
-        public Task Execute(object[] args)
+        public Task Execute(object argsObject)
         {
             return Task.Run(() =>
             {
                 string fullName = AssemblyDirectory.EnumerateFiles($"{Name}.dll").First().FullName;
                 Assembly assembly = Assembly.LoadFile(fullName);
-                assembly.EntryPoint.Invoke(null, args);
+                foreach (var work in assembly.GetExportedTypes().Where(type => type.IsAssignableTo(typeof(IWorkCode))))
+                {
+                    IWorkCode instance= (IWorkCode)assembly.CreateInstance(work.FullName);
+                    instance.Entrypoint(argsObject);
+                }
             });
         }
     }

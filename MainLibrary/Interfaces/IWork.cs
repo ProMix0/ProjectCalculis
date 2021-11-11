@@ -14,6 +14,6 @@ namespace MainLibrary.Interfaces
         string Name { get; }
         IWorkMetadata Metadata { get; }
         DirectoryInfo AssemblyDirectory { get; }
-        Task Execute(object[] args);
+        Task Execute(object argsObject);
     }
 }
