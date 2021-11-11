@@ -26,13 +26,13 @@ namespace Server
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-
-            foreach (var work in Directory.EnumerateDirectories(path.WorksDirectory, "*", SearchOption.TopDirectoryOnly))
+            foreach (var directory in path.WorksDirectories.Select(fullPath => new DirectoryInfo(fullPath)))
             {
-                DirectoryInfo directory = new(work);
-                works.Add(new Work(directory.Name, directory));
+                if (directory.Exists)
+                    foreach (var work in directory.EnumerateDirectories("*", SearchOption.TopDirectoryOnly))
+                        works.Add(new Work(work.Name, work));
             }
-            works.Sort((x,y)=>x.Name.CompareTo(y.Name));
+            works.Sort((x, y) => x.Name.CompareTo(y.Name));
 
             //Work work = new("TestWork", new(path.WorksDirectory));
             //Work work = new("TestWork", new(@"D:\Projects\ProjectCalculis\TestWork\bin\Debug\net5.0"));
@@ -49,7 +49,7 @@ namespace Server
                         client.GetWork = name =>
                         {
                             Console.WriteLine("Returned work");
-                            return works.Find(work=>work.Name.Equals(name));
+                            return works.Find(work => work.Name.Equals(name));
                         };
                     }
                 }, cancellationToken);

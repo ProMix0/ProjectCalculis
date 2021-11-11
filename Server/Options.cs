@@ -15,6 +15,6 @@ namespace Server
     {
         public const string Path = "Path";
 
-        public string WorksDirectory { get; set; }
+        public string[] WorksDirectories { get; set; }
     }
 }
