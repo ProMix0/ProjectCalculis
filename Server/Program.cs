@@ -14,8 +14,7 @@ namespace Server
     {
         static async Task Main(string[] args)
         {
-            IHostBuilder builder = new HostBuilder();
-            await builder
+            await new HostBuilder()
                 .ConfigureAppConfiguration(configHost =>
                 {
                     configHost
