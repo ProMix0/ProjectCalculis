@@ -34,11 +34,11 @@ namespace MainLibrary.Classes
             return reader.ReadBytes(count);
         }
 
-        //public override byte ReadByte()
-        //{
-        //    using CryptoStream cryptoStream = new(BaseStream, transform, CryptoStreamMode.Read, true);
-        //    using BinaryReader reader = new(cryptoStream, Encoding.UTF8, true);
-        //    return reader.ReadByte();
-        //}
+        public override byte ReadByte()
+        {
+            using CryptoStream cryptoStream = new(BaseStream, transform, CryptoStreamMode.Read, true);
+            using BinaryReader reader = new(cryptoStream, Encoding.UTF8, true);
+            return reader.ReadByte();
+        }
     }
 }

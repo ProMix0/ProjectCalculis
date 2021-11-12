@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Security;
 using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
@@ -28,12 +29,20 @@ namespace MainLibrary.Classes
         {
             stream = client.GetStream();
 
-            Rijndael rijndael = Rijndael.Create();
-            rijndael.Key = new byte[] { 23, 165, 58, 170, 51, 13, 69, 79, 6, 198, 166, 113, 183, 72, 235, 83, 82, 185, 45, 226, 243, 251, 169, 120, 49, 149, 31, 42, 152, 77, 245, 120 };
-            rijndael.IV = new byte[] { 196, 55, 81, 107, 226, 189, 74, 184, 9, 69, 91, 21, 103, 45, 208, 210 };
+            //https://habr.com/ru/post/497160/
+            SslStream ssl = new(stream);
+            ssl.AuthenticateAsServer(new SslServerAuthenticationOptions());
+            stream = ssl;
 
-            reader = new CryptoBinaryReader(stream, rijndael.CreateDecryptor());
-            writer = new CryptoBinaryWriter(stream, rijndael.CreateEncryptor());
+            reader = new(stream);
+            writer = new(stream);
+
+            //Rijndael rijndael = Rijndael.Create();
+            //rijndael.Key = new byte[] { 23, 165, 58, 170, 51, 13, 69, 79, 6, 198, 166, 113, 183, 72, 235, 83, 82, 185, 45, 226, 243, 251, 169, 120, 49, 149, 31, 42, 152, 77, 245, 120 };
+            //rijndael.IV = new byte[] { 196, 55, 81, 107, 226, 189, 74, 184, 9, 69, 91, 21, 103, 45, 208, 210 };
+
+            //reader = new CryptoBinaryReader(stream, rijndael.CreateDecryptor());
+            //writer = new CryptoBinaryWriter(stream, rijndael.CreateEncryptor());
             listenTask = Task.Run(Listen);
         }
 
@@ -44,7 +53,8 @@ namespace MainLibrary.Classes
                 while (true)
                 {
                     //while (true)
-                    //    Console.WriteLine(reader.ReadByte());
+                    //    foreach(var @byte in reader.ReadBytes(16))
+                    //    Console.WriteLine(@byte);
 
                     string name = reader.ReadString();
 

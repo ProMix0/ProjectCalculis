@@ -19,23 +19,23 @@ namespace MainLibrary.Classes
 
         public override void Write(int value)
         {
-            using (CryptoStream cryptoStream = new(OutStream, transform, CryptoStreamMode.Write, true))
-            using (BinaryWriter writer = new(cryptoStream, Encoding.UTF8, true))
-                writer.Write(value);
+            using CryptoStream cryptoStream = new(OutStream, transform, CryptoStreamMode.Write, true);
+            using BinaryWriter writer = new(cryptoStream, Encoding.UTF8, true);
+            writer.Write(value);
         }
 
         public override void Write(string value)
         {
-            using (CryptoStream cryptoStream = new(OutStream, transform, CryptoStreamMode.Write, true))
-            using (BinaryWriter writer = new(cryptoStream, Encoding.UTF8, true))
+            using CryptoStream cryptoStream = new(OutStream, transform, CryptoStreamMode.Write, true);
+            using BinaryWriter writer = new(cryptoStream, Encoding.UTF8, true);
                 writer.Write(value);
         }
 
         public override void Write(byte[] value)
         {
-            using (CryptoStream cryptoStream = new(OutStream, transform, CryptoStreamMode.Write, true))
-            using (BinaryWriter writer = new(cryptoStream, Encoding.UTF8, true))
-                writer.Write(value);
+            using CryptoStream cryptoStream = new(OutStream, transform, CryptoStreamMode.Write, true);
+            using BinaryWriter writer = new(cryptoStream, Encoding.UTF8, true);
+            writer.Write(value);
         }
     }
 }
