@@ -30,16 +30,20 @@ namespace MainLibrary.Classes
             stream = client.GetStream();
 
             //https://habr.com/ru/post/497160/
-            SslStream ssl = new(stream);
-            ssl.AuthenticateAsServer(new SslServerAuthenticationOptions());
-            stream = ssl;
+            //SslStream ssl = new(stream);
+            //ssl.AuthenticateAsServer(new SslServerAuthenticationOptions());
+            //stream = ssl;
 
-            reader = new(stream);
-            writer = new(stream);
+            //reader = new(stream);
+            //writer = new(stream);
 
-            //Rijndael rijndael = Rijndael.Create();
-            //rijndael.Key = new byte[] { 23, 165, 58, 170, 51, 13, 69, 79, 6, 198, 166, 113, 183, 72, 235, 83, 82, 185, 45, 226, 243, 251, 169, 120, 49, 149, 31, 42, 152, 77, 245, 120 };
-            //rijndael.IV = new byte[] { 196, 55, 81, 107, 226, 189, 74, 184, 9, 69, 91, 21, 103, 45, 208, 210 };
+            SymmetricAlgorithm cipher = Rijndael.Create();
+            cipher.Mode = CipherMode.CTS;
+            cipher.Key = new byte[] { 23, 165, 58, 170, 51, 13, 69, 79, 6, 198, 166, 113, 183, 72, 235, 83, 82, 185, 45, 226, 243, 251, 169, 120, 49, 149, 31, 42, 152, 77, 245, 120 };
+            cipher.IV = new byte[] { 196, 55, 81, 107, 226, 189, 74, 184, 9, 69, 91, 21, 103, 45, 208, 210 };
+
+            reader = new (new CryptoStream( stream, cipher.CreateDecryptor(),CryptoStreamMode.Read));
+            writer = new (new CryptoStream(stream, cipher.CreateEncryptor(),CryptoStreamMode.Write));
 
             //reader = new CryptoBinaryReader(stream, rijndael.CreateDecryptor());
             //writer = new CryptoBinaryWriter(stream, rijndael.CreateEncryptor());
