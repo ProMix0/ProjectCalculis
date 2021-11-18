@@ -39,12 +39,9 @@ namespace TestWork
                 listener.Start();
                 using TcpClient client = listener.AcceptTcpClient();
                 using CryptoStream stream = new(client.GetStream(), transform, CryptoStreamMode.Read);
-                using BinaryReader reader = new(stream);
-                Console.WriteLine(reader.ReadByte());
-                Console.WriteLine(reader.ReadByte());
+                //using BinaryReader rea
             });
         }
-
         public void Entrypoint(object argsObject)
         {
             Console.WriteLine("TestWork World!");
