@@ -42,7 +42,6 @@ namespace Server
                 client.GetWorksList = () => works;
                 client.GetWork = name =>
                 {
-                    Console.WriteLine("Returned work");
                     return works.Find(work => work.Name.Equals(name));
                 };
             };

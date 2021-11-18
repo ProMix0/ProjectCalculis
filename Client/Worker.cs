@@ -16,18 +16,23 @@ namespace Client
     class Worker : IHostedService
     {
         private PathOptions path;
-        public Worker(IOptions<PathOptions> options)
+        private List<IWorkMetadata> worksMetas;
+        private List<IWork> works;
+        private IRemoteServer server;
+        public Worker(IOptions<PathOptions> options,IRemoteServer server)
         {
             path = options.Value;
+            this.server = server;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             DirectoryInfo worksDirectory = new(path.WorksDirectory);
-            IRemoteServer server = new RemoteServer();
             server.ConnectTo(new(IPAddress.Loopback, 8008));
-            List<IWorkMetadata> worksMetas = await server.GetWorksListAsync();
-            List<IWork> works = Work.CreateWorksFrom(path.WorksDirectory);
+
+            worksMetas = await server.GetWorksListAsync();
+            works = Work.CreateWorksFrom(worksDirectory);
+
             foreach(var meta in worksMetas)
             {
                 IWork inlistWork = works.Find(work => work.Name.Equals(meta.Name));
