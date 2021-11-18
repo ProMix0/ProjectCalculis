@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MainLibrary.Interfaces
 {
-    public interface IRemoteClient
+    public interface IRemoteClient:IDisposable
     {
         WorkRequest GetWork { set; }
 

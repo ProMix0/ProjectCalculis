@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MainLibrary.Interfaces
 {
-    public interface IRemoteServer
+    public interface IRemoteServer : IDisposable
     {
         void ConnectTo(IPEndPoint endPoint);
 

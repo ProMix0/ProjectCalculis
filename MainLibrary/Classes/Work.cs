@@ -60,14 +60,13 @@ namespace MainLibrary.Classes
             return hash.ToArray();
         }
 
-        public static List<IWork> CreateWorksFrom(string path)
+        public static List<IWork> CreateWorksFrom(DirectoryInfo path)
         {
-            Directory.CreateDirectory(path);
-            return Directory.EnumerateDirectories(path, "*", SearchOption.TopDirectoryOnly).Select(folder =>
-              {
-                  DirectoryInfo directory = new(folder);
-                  return new Work(directory.Name, directory);
-              }).Cast<IWork>().ToList();
+            path.Create();
+            return path.EnumerateDirectories("*", SearchOption.TopDirectoryOnly)
+                       .Select(directory => new Work(directory.Name, directory))
+                       .Cast<IWork>()
+                       .ToList();
         }
     }
 }
