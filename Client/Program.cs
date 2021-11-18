@@ -32,6 +32,7 @@ namespace Client
                     services
                     .Configure<PathOptions>(context.Configuration.GetSection(PathOptions.Path))
                     .Configure<Options>(context.Configuration)
+                    .AddScoped<IRemoteServer, RemoteServer>()
                     .AddHostedService<Worker>();
                 })
                 .RunConsoleAsync();
