@@ -15,7 +15,7 @@ namespace MainLibrary.Classes
 
         public byte[] AssemblyHash { get; private set; }
 
-        internal WorkMetadata(string name, byte[] assemblyHash)
+        public WorkMetadata(string name, byte[] assemblyHash)
         {
             Name = name;
             AssemblyHash = assemblyHash;

@@ -19,18 +19,19 @@ namespace TestWork
             cipher.GenerateIV();
             cipher.GenerateKey();
 
-            Server(cipher.CreateDecryptor());
+            Server(cipher);
 
             using TcpClient server = new();
             server.Connect(IPAddress.Loopback, 3004);
-            CryptoStream stream = new(server.GetStream(), cipher.CreateEncryptor(), CryptoStreamMode.Write);
-            using BinaryWriter writer = new(stream,Encoding.UTF8, true);
-            for (int i = 0; i < 30; i++)
-                writer.Write((byte)(10 + i));
+            Stream stream = server.GetStream();
+            using BinaryWriter writer = new(new CryptoStream(stream, cipher.CreateDecryptor(), CryptoStreamMode.Write));
+            using BinaryReader reader = new(new CryptoStream(stream, cipher.CreateDecryptor(), CryptoStreamMode.Read));
+            writer.Write(10);
+            Console.WriteLine($"Client receive: {reader.ReadInt32()}");
             stream.Dispose();
         }
 
-        private static void Server(ICryptoTransform transform)
+        private static void Server(SymmetricAlgorithm cipher)
         {
             Task.Run(() =>
             {
@@ -38,8 +39,12 @@ namespace TestWork
                 TcpListener listener = new(IPAddress.Any, 3004);
                 listener.Start();
                 using TcpClient client = listener.AcceptTcpClient();
-                using CryptoStream stream = new(client.GetStream(), transform, CryptoStreamMode.Read);
-                //using BinaryReader rea
+                using Stream stream = client.GetStream();
+                using BinaryWriter writer = new(new CryptoStream(stream, cipher.CreateDecryptor(), CryptoStreamMode.Write));
+                using BinaryReader reader = new(new CryptoStream(stream, cipher.CreateDecryptor(), CryptoStreamMode.Read));
+                int temp = reader.ReadInt32();
+                Console.WriteLine($"Server receive: {temp}");
+                writer.Write(temp + 1);
             });
         }
         public void Entrypoint(object argsObject)
