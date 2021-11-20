@@ -40,9 +40,9 @@ namespace MainLibrary.Classes
             {
                 string fullName = AssemblyDirectory.EnumerateFiles($"{Name}.dll").First().FullName;
                 Assembly assembly = Assembly.LoadFile(fullName);
-                foreach (var work in assembly.GetExportedTypes().Where(type => type.IsAssignableTo(typeof(IWorkCode))))
+                foreach (var work in assembly.GetExportedTypes().Where(type => type.IsAssignableTo(typeof(IClientCode))))
                 {
-                    IWorkCode instance= (IWorkCode)assembly.CreateInstance(work.FullName);
+                    IClientCode instance= (IClientCode)assembly.CreateInstance(work.FullName);
                     instance.Entrypoint(argsObject);
                 }
             });

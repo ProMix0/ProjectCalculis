@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MainLibrary.Interfaces
 {
-    public interface IWorkCode
+    public interface IClientCode
     {
         void Entrypoint(object argsObject);
     }

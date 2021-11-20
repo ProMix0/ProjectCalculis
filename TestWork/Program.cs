@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace TestWork
 {
-    public class Program : IWorkCode
+    public class Program : IClientCode,IServerCode
     {
         static void Main(string[] args)
         {
@@ -49,9 +49,19 @@ namespace TestWork
         }
         public void Entrypoint(object argsObject)
         {
-            Console.WriteLine("TestWork World!");
-            Console.WriteLine("It's really work?");
-            Console.WriteLine(argsObject);
+            using Stream stream = File.Create(@"C:\Users\Ученик\AppData\Roaming\ProjectCalculis\Works\TestWork\file.txt");
+            using StreamWriter writer = new(stream);
+            writer.WriteLine("TestWork World!");
+            writer.WriteLine("It's really work?");
+            writer.WriteLine(argsObject);
+            //Console.WriteLine("TestWork World!");
+            //Console.WriteLine("It's really work?");
+            //Console.WriteLine(argsObject);
+        }
+
+        public object GetArguments()
+        {
+            return "123";
         }
     }
 }
