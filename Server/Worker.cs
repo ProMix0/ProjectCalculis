@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -34,7 +35,8 @@ namespace Server
             }
             works.Sort((x, y) => x.Name.CompareTo(y.Name));
 
-            TcpListener listener = new(System.Net.IPAddress.Loopback, 8008);
+            TcpListener listener = new(IPAddress.Loopback, 8008);
+
             listener.Start();
             while (true)
             {
