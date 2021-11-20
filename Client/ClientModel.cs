@@ -32,10 +32,15 @@ namespace Client
             }
         }
 
-        public async Task ExecuteAsync(IWorkMetadata metadata)
+        public Task ExecuteAsync(IWorkMetadata metadata)
+        {
+            return ExecuteAsync(metadata, null);
+        }
+
+        public async Task ExecuteAsync(IWorkMetadata metadata,object args)
         {
             IWork work = await GetWorkAsync(metadata);
-            await work.Execute(null);
+            await work.Execute(args);
         }
 
         private async Task<IWork> GetWorkAsync(IWorkMetadata metadata)

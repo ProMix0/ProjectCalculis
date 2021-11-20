@@ -9,5 +9,6 @@ namespace Client
         IReadOnlyCollection<IWorkMetadata> WorksMetas { get; }
 
         Task ExecuteAsync(IWorkMetadata metadata);
+        Task ExecuteAsync(IWorkMetadata metadata, object args);
     }
 }

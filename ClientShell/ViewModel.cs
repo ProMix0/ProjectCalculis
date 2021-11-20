@@ -1,9 +1,6 @@
 ﻿using MainLibrary.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Client;
 using System.Windows.Input;
 
@@ -37,12 +34,13 @@ namespace ClientShell
 
             public bool CanExecute(object parameter)
             {
-                return true;
+                CanExecuteChanged?.Invoke(parameter, null);
+                return parameter != null;
             }
 
             public async void Execute(object parameter)
             {
-                await model.ExecuteAsync(parameter as IWorkMetadata);
+                await model.ExecuteAsync(parameter as IWorkMetadata, "123");
             }
         }
     }
