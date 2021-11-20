@@ -55,7 +55,7 @@ namespace MainLibrary.Classes
             string workName = workMetadata.Name;
             writer.Write(workName);
 
-            DirectoryInfo directory = new(worksDirectory.FullName + workName);
+            DirectoryInfo directory = worksDirectory.CreateSubdirectory(workName);
             int count = reader.ReadInt32();
             for (int i = 0; i < count; i++)
             {
