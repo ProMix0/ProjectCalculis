@@ -12,36 +12,14 @@ namespace ClientShell
         public ViewModel(IClientModel model)
         {
             this.model = model;
-            ExecuteCommand = new(model);
+            ExecuteCommand = new(async parameter => await model.ExecuteAsync(parameter as IWorkMetadata),
+                                 parameter => parameter != null);
         }
 
         private IClientModel model;
 
         public IReadOnlyCollection<IWorkMetadata> Metadatas => model.WorksMetas;
 
-        public ExecuteCommandClass ExecuteCommand { get; }
-
-        public class ExecuteCommandClass : ICommand
-        {
-            private IClientModel model;
-
-            public ExecuteCommandClass(IClientModel model)
-            {
-                this.model = model;
-            }
-
-            public event EventHandler CanExecuteChanged;
-
-            public bool CanExecute(object parameter)
-            {
-                CanExecuteChanged?.Invoke(parameter, null);
-                return parameter != null;
-            }
-
-            public async void Execute(object parameter)
-            {
-                await model.ExecuteAsync(parameter as IWorkMetadata, "123");
-            }
-        }
+        public RelayCommand ExecuteCommand { get; }
     }
 }
