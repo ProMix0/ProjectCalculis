@@ -14,6 +14,6 @@ namespace MainLibrary.Interfaces
 
         Task<List<IWorkMetadata>> GetWorksListAsync();
 
-        Task<IWork> DownloadWorkAsync(IWorkMetadata workMetadata, DirectoryInfo worksDirectory);
+        Task<IWork> DownloadWorkAsync(IWorkMetadata workMetadata);
     }
 }
