@@ -38,8 +38,8 @@ namespace MainLibrary.Classes
             //ssl.AuthenticateAsServer(new SslServerAuthenticationOptions());
             //stream = ssl;
 
-            reader = new(stream);
-            writer = new(stream);
+            //reader = new(stream);
+            //writer = new(stream);
 
             //SymmetricAlgorithm cipher = Rijndael.Create();
             //cipher.Mode = CipherMode.CTS;
@@ -55,6 +55,9 @@ namespace MainLibrary.Classes
             listenTask = Task.Run(Listen,token.Token);
         }
 
+        private MetadataListContract metadataContract = new();
+        private WorkContract workContract = new(null);
+
         private void Listen()
         {
             try
@@ -65,34 +68,18 @@ namespace MainLibrary.Classes
                     //    foreach(var @byte in reader.ReadBytes(16))
                     //    Console.WriteLine(@byte);
 
-                    string name = reader.ReadString();
+                    string request = reader.ReadString();
 
-                    if (name.Equals("GET works"))
+                    if (metadataContract.IsRequest(request,out _))
                     {
-                        List<IWork> list = GetWorksList?.Invoke();
-                        writer.Write(list.Count);
-                        foreach (var workToSend in list)
-                        {
-                            IWorkMetadata metadata = workToSend.Metadata;
-                            writer.Write(metadata.Name);
-                            writer.Write((int)metadata.AssemblyHash.Length);
-                            writer.Write(metadata.AssemblyHash);
-                        }
+                        metadataContract.SendData(stream, GetWorksList?.Invoke());
                         continue;
                     }
-
-                    IWork work = GetWork?.Invoke(name);
-
-                    List<FileInfo> files = work.AssemblyDirectory.EnumerateFiles("*", SearchOption.AllDirectories).ToList();
-                    writer.Write(files.Count);
-                    foreach (var file in files)
+                    string[] args = null;
+                    if (workContract.IsRequest(request, out args))
                     {
-                        writer.Write(file.FullName[work.AssemblyDirectory.FullName.Length..]);
-
-                        writer.Write((int)file.Length);
-
-                        byte[] data = File.ReadAllBytes(file.FullName);
-                        writer.Write(data);
+                        workContract.SendData(stream, GetWork?.Invoke(args[0])).Wait();
+                        continue;
                     }
                 }
             }
