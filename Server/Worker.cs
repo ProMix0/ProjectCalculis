@@ -29,6 +29,7 @@ namespace Server
         {
             foreach (var directory in path.WorksDirectories.Select(fullPath => new DirectoryInfo(fullPath)))
             {
+                if(directory.Exists)
                 foreach (var work in directory.EnumerateDirectories("*", SearchOption.TopDirectoryOnly))
                 {
                     ServerWork tempWork = ServerWork.TryCreate(work);

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace TestWork
 {
-    public class Program : IClientCode,IServerCode
+    public class Program : IClientCode, IServerCode
     {
         static void Main(string[] args)
         {
@@ -53,7 +53,7 @@ namespace TestWork
             //Console.WriteLine("TestWork World!");
             //Console.WriteLine("It's really work?");
             //Console.WriteLine(argsObject);
-            return null;
+            return Task.FromResult(new byte[] { 0, 9, 8 });
         }
 
         public byte[] GetArgument()

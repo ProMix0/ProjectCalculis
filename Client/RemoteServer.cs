@@ -1,4 +1,6 @@
-﻿using MainLibrary.Interfaces;
+﻿using MainLibrary.Classes;
+using MainLibrary.Interfaces;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,7 +10,7 @@ using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
-namespace MainLibrary.Classes
+namespace Client
 {
     public class RemoteServer : IRemoteServer
     {
@@ -20,9 +22,9 @@ namespace MainLibrary.Classes
         private MetadataListContract metadataContract = new();
         private WorkContract workContract;
 
-        public RemoteServer(DirectoryInfo worksDirectory)
+        public RemoteServer(IOptions<PathOptions> options)
         {
-            this.worksDirectory = worksDirectory;
+            worksDirectory = new(options.Value.WorksDirectory);
             workContract = new(worksDirectory);
         }
 
@@ -67,6 +69,11 @@ namespace MainLibrary.Classes
         public Task<List<IWorkMetadata>> GetWorksListAsync()
         {
             return metadataContract.ReceiveData(stream, null);
+        }
+
+        public Task SendWorkResult(IWorkMetadata workMetadata, byte[] result)
+        {
+            throw new NotImplementedException();
         }
     }
 }

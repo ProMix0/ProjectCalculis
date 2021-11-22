@@ -38,7 +38,7 @@ namespace MainLibrary.Classes
             //ssl.AuthenticateAsServer(new SslServerAuthenticationOptions());
             //stream = ssl;
 
-            //reader = new(stream);
+            reader = new(stream);
             //writer = new(stream);
 
             //SymmetricAlgorithm cipher = Rijndael.Create();
