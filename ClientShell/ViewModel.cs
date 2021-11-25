@@ -34,8 +34,9 @@ namespace ClientShell
 
             public bool CanExecute(object parameter)
             {
-                CanExecuteChanged?.Invoke(parameter, null);
-                return parameter != null;
+                //CanExecuteChanged?.Invoke(parameter, null);
+                //return parameter != null;
+                return true;
             }
 
             public async void Execute(object parameter)
