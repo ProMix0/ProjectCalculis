@@ -8,6 +8,6 @@ namespace MainLibrary.Interfaces
 {
     public interface IClientCode
     {
-        void Entrypoint(object argsObject);
+        Task<byte[]> Entrypoint(byte[] args);
     }
 }

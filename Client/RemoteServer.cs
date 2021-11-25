@@ -1,4 +1,6 @@
-﻿using MainLibrary.Interfaces;
+﻿using MainLibrary.Classes;
+using MainLibrary.Interfaces;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,7 +10,7 @@ using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
-namespace MainLibrary.Classes
+namespace Client
 {
     public class RemoteServer : IRemoteServer
     {
@@ -16,6 +18,15 @@ namespace MainLibrary.Classes
         private BinaryReader reader;
         private BinaryWriter writer;
         private TcpClient client;
+        private DirectoryInfo worksDirectory;
+        private MetadataListContract metadataContract = new();
+        private WorkContract workContract;
+
+        public RemoteServer(IOptions<PathOptions> options)
+        {
+            worksDirectory = new(options.Value.WorksDirectory);
+            workContract = new(worksDirectory);
+        }
 
         public void ConnectTo(IPEndPoint endPoint)
         {
@@ -27,8 +38,8 @@ namespace MainLibrary.Classes
             //ssl.AuthenticateAsClient(new SslClientAuthenticationOptions());
             //stream = ssl;
 
-            reader = new(stream);
-            writer = new(stream);
+            //reader = new(stream);
+            //writer = new(stream);
 
             //SymmetricAlgorithm cipher = Rijndael.Create();
             //cipher.Mode = CipherMode.CTS;
@@ -50,42 +61,19 @@ namespace MainLibrary.Classes
             client.Dispose();
         }
 
-        public async Task<IWork> DownloadWorkAsync(IWorkMetadata workMetadata, DirectoryInfo worksDirectory)
+        public Task<IWork> DownloadWorkAsync(IWorkMetadata workMetadata)
         {
-            string workName = workMetadata.Name;
-            writer.Write(workName);
-
-            DirectoryInfo directory = worksDirectory.CreateSubdirectory(workName);
-            int count = reader.ReadInt32();
-            for (int i = 0; i < count; i++)
-            {
-                string name = reader.ReadString();
-
-                int size = reader.ReadInt32();
-
-                FileInfo file = new(directory.FullName + name);
-                file.Directory.Create();
-                byte[] data = reader.ReadBytes(size);
-                using Stream fileStream = file.Create();
-                await fileStream.WriteAsync(data);
-            }
-
-            return new Work(workName, directory);
+            return workContract.ReceiveData(stream,new string[] { workMetadata.Name });
         }
 
         public Task<List<IWorkMetadata>> GetWorksListAsync()
         {
-            writer.Write("GET works");
+            return metadataContract.ReceiveData(stream, null);
+        }
 
-            int count = reader.ReadInt32();
-            List<IWorkMetadata> result = new();
-            for (int i = 0; i < count; i++)
-            {
-                string name = reader.ReadString();
-                byte[] hash = reader.ReadBytes(reader.ReadInt32());
-                result.Add(new WorkMetadata(name, hash));
-            }
-            return Task.FromResult(result);
+        public Task SendWorkResult(IWorkMetadata workMetadata, byte[] result)
+        {
+            throw new NotImplementedException();
         }
     }
 }

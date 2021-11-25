@@ -5,7 +5,7 @@ namespace ClientShell
 {
     public interface IViewModel
     {
-        ViewModel.ExecuteCommandClass ExecuteCommand { get; }
+        RelayCommand ExecuteCommand { get; }
         IReadOnlyCollection<IWorkMetadata> Metadatas { get; }
     }
 }

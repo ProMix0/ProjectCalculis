@@ -34,18 +34,21 @@ namespace MainLibrary.Classes
             AssemblyDirectory = directory;
         }
 
-        public Task Execute(object argsObject)
+        private IClientCode GetClient()
         {
-            return Task.Run(() =>
+            if (client == null)
             {
                 string fullName = AssemblyDirectory.EnumerateFiles($"{Name}.dll").First().FullName;
                 Assembly assembly = Assembly.LoadFile(fullName);
-                foreach (var work in assembly.GetExportedTypes().Where(type => type.IsAssignableTo(typeof(IClientCode))))
-                {
-                    IClientCode instance= (IClientCode)assembly.CreateInstance(work.FullName);
-                    instance.Entrypoint(argsObject);
-                }
-            });
+                Type work = assembly.GetExportedTypes().Where(type => type.IsAssignableTo(typeof(IClientCode))).First();
+                client = (IClientCode)assembly.CreateInstance(work.FullName);
+            }
+            return client;
+        }
+        private IClientCode client;
+        public Task<byte[]> Execute(byte[] args)
+        {
+            return GetClient().Entrypoint(args);
         }
 
         public byte[] CalculateHash()

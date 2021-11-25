@@ -8,6 +8,6 @@ namespace MainLibrary.Interfaces
 {
     public interface IServerCode
     {
-        object GetArguments();
+        byte[] GetArgument();
     }
 }

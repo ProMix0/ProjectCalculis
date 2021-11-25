@@ -11,6 +11,6 @@ namespace MainLibrary.Interfaces
         WorkRequest GetWork { set; }
 
         delegate IWork WorkRequest(string workName);
-        delegate List<IWork> WorksListRequest();
+        delegate List<IWorkMetadata> WorksListRequest();
     }
 }

@@ -37,19 +37,21 @@ namespace Client
             return ExecuteAsync(metadata, null);
         }
 
-        public async Task ExecuteAsync(IWorkMetadata metadata,object args)
+        public async Task ExecuteAsync(IWorkMetadata metadata, byte[] args)
         {
             IWork work = await GetWorkAsync(metadata);
-            await work.Execute(args);
+            byte[] result=await work.Execute(args);
         }
 
         private async Task<IWork> GetWorkAsync(IWorkMetadata metadata)
         {
             if (works == null) works = Work.CreateWorksFrom(worksDirectory);
             IWork work = works.Find(work => work.Name.Equals(metadata.Name));
-            if (work == null)
+            if (work == null || !work.Metadata.Equals(metadata))
             {
-                work = await server.DownloadWorkAsync(metadata, worksDirectory);
+                worksDirectory.CreateSubdirectory(metadata.Name).Delete(true);
+                work = await server.DownloadWorkAsync(metadata);
+                /*if (work != null)*/ works.Remove(work);
                 works.Add(work);
             }
             return work;

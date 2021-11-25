@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace TestWork
 {
-    public class Program : IClientCode,IServerCode
+    public class Program : IClientCode, IServerCode
     {
         static void Main(string[] args)
         {
@@ -47,21 +47,18 @@ namespace TestWork
                 writer.Write(temp + 1);
             });
         }
-        public void Entrypoint(object argsObject)
+        public Task<byte[]> Entrypoint(byte[] args)
         {
-            using Stream stream = File.Create(@"C:\Users\Ученик\AppData\Roaming\ProjectCalculis\Works\TestWork\file.txt");
-            using StreamWriter writer = new(stream);
-            writer.WriteLine("TestWork World!");
-            writer.WriteLine("It's really work?");
-            writer.WriteLine(argsObject);
+            //MessageBox.Show
             //Console.WriteLine("TestWork World!");
             //Console.WriteLine("It's really work?");
             //Console.WriteLine(argsObject);
+            return Task.FromResult(new byte[] { 0, 9, 8 });
         }
 
-        public object GetArguments()
+        public byte[] GetArgument()
         {
-            return "123";
+            return null;
         }
     }
 }

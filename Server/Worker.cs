@@ -18,7 +18,7 @@ namespace Server
     class Worker : IHostedService
     {
         private PathOptions path;
-        private List<IWork> works = new();
+        private List<ServerWork> works = new();
 
         public Worker(IOptions<PathOptions> path)
         {
@@ -29,11 +29,14 @@ namespace Server
         {
             foreach (var directory in path.WorksDirectories.Select(fullPath => new DirectoryInfo(fullPath)))
             {
-                if (directory.Exists)
-                    foreach (var work in directory.EnumerateDirectories("*", SearchOption.TopDirectoryOnly))
-                        works.Add(new Work(work.Name, work));
+                if(directory.Exists)
+                foreach (var work in directory.EnumerateDirectories("*", SearchOption.TopDirectoryOnly))
+                {
+                    ServerWork tempWork = ServerWork.TryCreate(work);
+                    if (tempWork != null) works.Add(tempWork);
+                }
             }
-            works.Sort((x, y) => x.Name.CompareTo(y.Name));
+            //works.Sort((x, y) => x.Name.CompareTo(y.Name));
 
             TcpListener listener = new(IPAddress.Loopback, 8008);
 
@@ -41,10 +44,10 @@ namespace Server
             while (true)
             {
                 RemoteClient client = new(await listener.AcceptTcpClientAsync());
-                client.GetWorksList = () => works;
+                client.GetWorksList = () => works.Select(work => work.Metadata).ToList();
                 client.GetWork = name =>
                 {
-                    return works.Find(work => work.Name.Equals(name));
+                    return works.Find(work => work.Name.Equals(name)).Work;
                 };
             };
 
