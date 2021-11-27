@@ -1,4 +1,5 @@
-﻿using MainLibrary.Interfaces;
+﻿using MainLibrary.Abstractions;
+using MainLibrary.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,37 +10,29 @@ using System.Threading.Tasks;
 
 namespace MainLibrary.Classes
 {
-    public class ResultContract : ITransferContract<byte[]>
+    public class ResultContract : PostContract<byte[]>
     {
-
-        private string requestTemplate = "RESULT name";
-        private Regex requestRegex = new(@"RESULT (\w+)");
-        public bool IsRequest(string request, out string[] args)
+        public ResultContract(Action<byte[],string[]> onReceive) : base("RESULT name", new(@"POST RESULT (\w+)"), new string[] { "name" },onReceive)
         {
-            if (requestRegex.IsMatch(request))
-            {
-                Match match = requestRegex.Match(request);
-                List<string> groups = new();
-                for (int i = 1; i < match.Groups.Count; i++)
-                    groups.Add(match.Groups[i].Value);
-                args = groups.ToArray();
-                return true;
-            }
-            else
-            {
-                args = Array.Empty<string>();
-                return false;
-            }
+            AsServer();
         }
 
-        public Task<byte[]> ReceiveData(Stream stream, string[] args)
+        public ResultContract() : base("RESULT name", new(@"POST RESULT (\w+)"), new string[] { "name" }, null)
         {
-            throw new NotImplementedException();
+            AsClient();
         }
 
-        public Task SendData(Stream stream, byte[] data)
+        protected async override Task<byte[]> ReceiveData(BinaryReader reader)
         {
-            throw new NotImplementedException();
+            byte[] result = new byte[reader.ReadInt32()];
+            await reader.BaseStream.ReadAsync(result);
+            return result;
+        }
+
+        protected async override Task SendData(BinaryWriter writer, byte[] data)
+        {
+            writer.Write(data.Length);
+            await writer.BaseStream.WriteAsync(data);
         }
     }
 }

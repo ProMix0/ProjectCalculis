@@ -1,4 +1,5 @@
-﻿using MainLibrary.Interfaces;
+﻿using MainLibrary.Abstractions;
+using MainLibrary.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,45 +10,57 @@ using System.Threading.Tasks;
 
 namespace MainLibrary.Classes
 {
-    public class WorkContract : ITransferContract<IWork>
+    public class WorkContract : GetContract<IWork>
     {
-        private string requestTemplate = "GET name";
-        private Regex requestRegex;
         private DirectoryInfo worksDirectory;
 
-        public WorkContract(DirectoryInfo worksDirectory)
+        public WorkContract(DirectoryInfo worksDirectory) : base("name",
+                                                                 new(@"GET (\w+)"),
+                                                                 new string[] { "name" },
+                                                                 null)
         {
+            AsClient();
             this.worksDirectory = worksDirectory;
-            requestRegex = new(@"GET (\w+)");
         }
 
-        public bool IsRequest(string request, out string[] args)
+        public WorkContract(Func<string[], IWork> onSend) : base("name",
+                                                                 new(@"GET (\w+)"),
+                                                                 new string[] { "name" },
+                                                                 onSend)
         {
-            if (requestRegex.IsMatch(request))
-            {
-                Match match = requestRegex.Match(request);
-                List<string> groups = new();
-                for (int i = 1; i < match.Groups.Count; i++)
-                    groups.Add(match.Groups[i].Value);
-                args = groups.ToArray();
-                return true;
-            }
-            else
-            {
-                args = Array.Empty<string>();
-                return false;
-            }
-
+            AsServer();
         }
 
-        public async Task<IWork> ReceiveData(Stream stream, string[] args)
+        //public async Task<IWork> RequestData(Stream stream, string[] args)
+        //{
+        //    using BinaryWriter writer = new(stream, Encoding.UTF8, true);
+        //    using BinaryReader reader = new(stream, Encoding.UTF8, true);
+
+        //    string workName = args[0];
+        //    writer.Write(requestTemplate.Replace("name", workName));
+
+        //    DirectoryInfo directory = worksDirectory.CreateSubdirectory(workName);
+        //    int count = reader.ReadInt32();
+        //    for (int i = 0; i < count; i++)
+        //    {
+        //        string name = reader.ReadString();
+
+        //        int size = reader.ReadInt32();
+
+        //        FileInfo file = new(directory.FullName + name);
+        //        file.Directory.Create();
+        //        byte[] data = reader.ReadBytes(size);
+        //        using Stream fileStream = file.Create();
+        //        await fileStream.WriteAsync(data);
+        //    }
+
+        //    return new Work(workName, directory);
+        //}
+
+
+        protected async override Task<IWork> RequestData(BinaryReader reader)
         {
-            using BinaryWriter writer = new(stream, Encoding.UTF8, true);
-            using BinaryReader reader = new(stream, Encoding.UTF8, true);
-
-            string workName = args[0];
-            writer.Write(requestTemplate.Replace("name", workName));
-
+            string workName = Args[0];
             DirectoryInfo directory = worksDirectory.CreateSubdirectory(workName);
             int count = reader.ReadInt32();
             for (int i = 0; i < count; i++)
@@ -66,9 +79,27 @@ namespace MainLibrary.Classes
             return new Work(workName, directory);
         }
 
-        public async Task SendData(Stream stream, IWork work)
+        //public async Task SendData(Stream stream, IWork work)
+        //{
+        //    using BinaryWriter writer = new(stream, Encoding.UTF8, true);
+        //    List<FileInfo> files = work.AssemblyDirectory.EnumerateFiles("*", SearchOption.AllDirectories).ToList();
+        //    writer.Write(files.Count);
+        //    foreach (var file in files)
+        //    {
+        //        writer.Write(file.FullName[work.AssemblyDirectory.FullName.Length..]);
+
+        //        writer.Write((int)file.Length);
+
+        //        //byte[] data = File.ReadAllBytes(file.FullName);
+        //        //writer.Write(data);
+        //        using Stream fileStream = file.OpenRead();
+        //        await fileStream.CopyToAsync(stream);
+        //    }
+        //    return;
+        //}
+
+        protected async override Task SendData(BinaryWriter writer, IWork work)
         {
-            using BinaryWriter writer = new(stream, Encoding.UTF8, true);
             List<FileInfo> files = work.AssemblyDirectory.EnumerateFiles("*", SearchOption.AllDirectories).ToList();
             writer.Write(files.Count);
             foreach (var file in files)
@@ -80,7 +111,7 @@ namespace MainLibrary.Classes
                 //byte[] data = File.ReadAllBytes(file.FullName);
                 //writer.Write(data);
                 using Stream fileStream = file.OpenRead();
-                await fileStream.CopyToAsync(stream);
+                await fileStream.CopyToAsync(writer.BaseStream);
             }
             return;
         }

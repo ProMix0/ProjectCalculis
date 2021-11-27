@@ -41,6 +41,7 @@ namespace Client
         {
             IWork work = await GetWorkAsync(metadata);
             byte[] result=await work.Execute(args);
+            await server.SendWorkResult(metadata, result);
         }
 
         private async Task<IWork> GetWorkAsync(IWorkMetadata metadata)

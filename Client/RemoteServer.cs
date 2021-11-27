@@ -19,13 +19,18 @@ namespace Client
         private BinaryWriter writer;
         private TcpClient client;
         private DirectoryInfo worksDirectory;
-        private MetadataListContract metadataContract = new();
+
+        private MetadataListContract metadataContract;
         private WorkContract workContract;
+        private ResultContract resultContract;
 
         public RemoteServer(IOptions<PathOptions> options)
         {
             worksDirectory = new(options.Value.WorksDirectory);
+
             workContract = new(worksDirectory);
+            metadataContract = new();
+            resultContract = new();
         }
 
         public void ConnectTo(IPEndPoint endPoint)
@@ -63,17 +68,17 @@ namespace Client
 
         public Task<IWork> DownloadWorkAsync(IWorkMetadata workMetadata)
         {
-            return workContract.ReceiveData(stream,new string[] { workMetadata.Name });
+            return workContract.RequestData(stream,new string[] { workMetadata.Name });
         }
 
         public Task<List<IWorkMetadata>> GetWorksListAsync()
         {
-            return metadataContract.ReceiveData(stream, null);
+            return metadataContract.RequestData(stream, null);
         }
 
-        public Task SendWorkResult(IWorkMetadata workMetadata, byte[] result)
+        public Task SendWorkResult(IWorkMetadata metadata, byte[] result)
         {
-            throw new NotImplementedException();
+            return resultContract.SendData(stream, result, new string[] { metadata.Name });
         }
     }
 }

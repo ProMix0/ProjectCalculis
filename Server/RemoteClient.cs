@@ -19,8 +19,9 @@ namespace MainLibrary.Classes
 {
     public class RemoteClient : IRemoteClient
     {
-        public IRemoteClient.WorkRequest GetWork { set; private get; }
-        public IRemoteClient.WorksListRequest GetWorksList { set; private get; }
+        public Func<string, IWork> GetWork { set; private get; }
+        public Func<List<IWorkMetadata>> GetWorksList { set; private get; }
+        public Action<byte[],string> ReceiveResult { set; private get; }
         private Task listenTask;
         private CancellationTokenSource token;
         private readonly Stream stream;
@@ -52,14 +53,18 @@ namespace MainLibrary.Classes
             //reader = new CryptoBinaryReader(stream, rijndael.CreateDecryptor());
             //writer = new CryptoBinaryWriter(stream, rijndael.CreateEncryptor());
             token = new CancellationTokenSource();
-            listenTask = Task.Run(Listen,token.Token);
+            listenTask = Task.Run(Listen, token.Token);
         }
 
-        private MetadataListContract metadataContract = new();
-        private WorkContract workContract = new(null);
+        private MetadataListContract metadataContract;
+        private WorkContract workContract;
+        private ResultContract resultContract;
 
         private void Listen()
         {
+            metadataContract = new(array => GetWorksList());
+            workContract = new(array => GetWork(array[0]));
+            resultContract = new((result, args) => ReceiveResult(result,args[0]));
             try
             {
                 while (true)
@@ -69,17 +74,27 @@ namespace MainLibrary.Classes
                     //    Console.WriteLine(@byte);
 
                     string request = reader.ReadString();
-
-                    if (metadataContract.IsRequest(request,out _))
+                    switch (request)
                     {
-                        metadataContract.SendData(stream, GetWorksList?.Invoke());
-                        continue;
-                    }
-                    string[] args = null;
-                    if (workContract.IsRequest(request, out args))
-                    {
-                        workContract.SendData(stream, GetWork?.Invoke(args[0])).Wait();
-                        continue;
+                        case string _ when request.StartsWith("GET"):
+                            if (metadataContract.IsRequest(request))
+                            {
+                                metadataContract.SendData(stream).Wait();
+                                break;
+                            }
+                            if (workContract.IsRequest(request))
+                            {
+                                workContract.SendData(stream).Wait();
+                                break;
+                            }
+                            break;
+                        case string _ when request.StartsWith("POST"):
+                            if(resultContract.IsRequest(request))
+                            {
+                                resultContract.ReceiveData(stream).Wait();
+                                break;
+                            }
+                            break;
                     }
                 }
             }
