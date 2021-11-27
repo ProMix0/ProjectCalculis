@@ -9,5 +9,6 @@ namespace MainLibrary.Interfaces
     public interface IServerCode
     {
         byte[] GetArgument();
+        void SetResult(byte[] result);
     }
 }

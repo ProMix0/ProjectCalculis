@@ -56,6 +56,11 @@ namespace TestWork
             return Task.FromResult(new byte[] { 0, 9, 8 });
         }
 
+        public void SetResult(byte[] result)
+        {
+            Console.WriteLine("Receive result");
+        }
+
         public byte[] GetArgument()
         {
             return null;
