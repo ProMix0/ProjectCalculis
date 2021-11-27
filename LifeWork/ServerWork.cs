@@ -13,5 +13,10 @@ namespace LifeWork
         {
             return new byte[] { 3, 2, 1 };
         }
+
+        public void SetResult(byte[] result)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
