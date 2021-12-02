@@ -16,7 +16,8 @@ namespace LifeWork
 
         public void SetResult(byte[] result)
         {
-            throw new NotImplementedException();
+            foreach (var item in result)
+                Console.Write($"{item} ");
         }
     }
 }
