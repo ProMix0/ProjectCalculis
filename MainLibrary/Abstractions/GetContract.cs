@@ -31,14 +31,14 @@ namespace MainLibrary.Abstractions
             for (int i = 0; i < args.Length; i++)
                 request = request.Replace(associations[i], args[i]);
             writer.Write($"GET {request}");
-            return RequestData(reader).ContinueWith(task=>
+            return ReceiveData(reader).ContinueWith(task=>
             {
                 reader.Dispose();
                 return task.Result;
             });
         }
 
-        protected abstract Task<T> RequestData(BinaryReader reader);
+        protected abstract Task<T> ReceiveData(BinaryReader reader);
 
         public Task SendData(Stream stream)
         {
@@ -46,15 +46,6 @@ namespace MainLibrary.Abstractions
 
             using BinaryWriter writer = new(stream, Encoding.UTF8, true);
             return SendData(writer, onSend?.Invoke(Args));
-        }
-
-        public override sealed GetContract<T> AsServer()
-        {
-            return (GetContract<T>)base.AsServer();
-        }
-        public override sealed GetContract<T> AsClient()
-        {
-            return (GetContract<T>)base.AsClient();
         }
 
         protected abstract Task SendData(BinaryWriter writer, T data);

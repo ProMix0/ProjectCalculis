@@ -7,17 +7,21 @@ using System.Threading.Tasks;
 
 namespace LifeWork
 {
-    class ServerWork : IServerCode
+    public class ServerWork : IServerCode
     {
+        private Random random = new();
         public byte[] GetArgument()
         {
-            return new byte[] { 3, 2, 1 };
+            byte[] cells = new byte[25];
+            for (int i = 0; i < cells.Length; i++)
+                cells[i] = (byte)random.Next(0, 1);
+            return cells;
         }
 
         public void SetResult(byte[] result)
         {
             foreach (var item in result)
-                Console.Write($"{item} ");
+                Console.WriteLine($"{item} ");
         }
     }
 }

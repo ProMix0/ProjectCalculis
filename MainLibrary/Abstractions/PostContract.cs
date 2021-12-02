@@ -42,15 +42,6 @@ namespace MainLibrary.Abstractions
             return SendData(writer, data);
         }
 
-        public override sealed PostContract<T> AsServer()
-        {
-            return (PostContract < T > )base.AsServer();
-        }
-        public override sealed PostContract<T> AsClient()
-        {
-            return (PostContract<T>)base.AsClient();
-        }
-
         protected abstract Task SendData(BinaryWriter writer, T data);
     }
 }

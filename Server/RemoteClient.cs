@@ -20,13 +20,14 @@ namespace MainLibrary.Classes
     public class RemoteClient : IRemoteClient
     {
         public Func<string, IWork> GetWork { set; private get; }
+        public Func<string, byte[]> GetArgs{ set; private get; }
         public Func<List<IWorkMetadata>> GetWorksList { set; private get; }
         public Action<byte[],string> ReceiveResult { set; private get; }
         private Task listenTask;
         private CancellationTokenSource token;
         private readonly Stream stream;
         private BinaryReader reader;
-        private BinaryWriter writer;
+        //private BinaryWriter writer;
         private TcpClient client;
 
         public RemoteClient(TcpClient client)
@@ -59,12 +60,14 @@ namespace MainLibrary.Classes
         private MetadataListContract metadataContract;
         private WorkContract workContract;
         private ResultContract resultContract;
+        private ArgsContract argsContract;
 
         private void Listen()
         {
             metadataContract = new(array => GetWorksList());
             workContract = new(array => GetWork(array[0]));
             resultContract = new((result, args) => ReceiveResult(result,args[0]));
+            argsContract = new(args => GetArgs(args[0]));
             try
             {
                 while (true)
@@ -85,6 +88,11 @@ namespace MainLibrary.Classes
                             if (workContract.IsRequest(request))
                             {
                                 workContract.SendData(stream).Wait();
+                                break;
+                            }
+                            if (argsContract.IsRequest(request))
+                            {
+                                argsContract.SendData(stream).Wait();
                                 break;
                             }
                             break;
@@ -108,7 +116,7 @@ namespace MainLibrary.Classes
         {
             token.Cancel();
             reader.Dispose();
-            writer.Dispose();
+            //writer.Dispose();
             stream.Dispose();
             client.Dispose();
         }

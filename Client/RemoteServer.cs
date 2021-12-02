@@ -23,6 +23,7 @@ namespace Client
         private MetadataListContract metadataContract;
         private WorkContract workContract;
         private ResultContract resultContract;
+        private ArgsContract argsContract;
 
         public RemoteServer(IOptions<PathOptions> options)
         {
@@ -31,6 +32,7 @@ namespace Client
             workContract = new(worksDirectory);
             metadataContract = new();
             resultContract = new();
+            argsContract = new();
         }
 
         public void ConnectTo(IPEndPoint endPoint)
@@ -66,12 +68,17 @@ namespace Client
             client.Dispose();
         }
 
-        public Task<IWork> DownloadWorkAsync(IWorkMetadata workMetadata)
+        public Task<IWork> DownloadWork(IWorkMetadata workMetadata)
         {
             return workContract.RequestData(stream,new string[] { workMetadata.Name });
         }
 
-        public Task<List<IWorkMetadata>> GetWorksListAsync()
+        public Task<byte[]> GetArgs(IWorkMetadata metadata)
+        {
+            return argsContract.RequestData(stream,new string[] { metadata.Name });
+        }
+
+        public Task<List<IWorkMetadata>> GetWorksList()
         {
             return metadataContract.RequestData(stream, null);
         }

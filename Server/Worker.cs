@@ -38,7 +38,7 @@ namespace Server
             }
             //works.Sort((x, y) => x.Name.CompareTo(y.Name));
 
-            TcpListener listener = new(IPAddress.Loopback, 8008);
+            TcpListener listener = new(IPAddress.Any, 8008);
 
             listener.Start();
             while (true)
@@ -47,6 +47,7 @@ namespace Server
                 client.GetWorksList = () => works.Select(work => work.Metadata).ToList();
                 client.GetWork = name => works.Find(work => work.Name.Equals(name)).Work;
                 client.ReceiveResult = (result, name) => works.Find(work => work.Name.Equals(name)).Server.SetResult(result);
+                client.GetArgs = name => works.Find(work => work.Name.Equals(name)).Server.GetArgument();
             };
 
         }

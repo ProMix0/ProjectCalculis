@@ -46,21 +46,19 @@ namespace MainLibrary.Abstractions
             }
         }
 
-        public virtual TransferContract AsServer()
+        protected void AsServer()
         {
             if (ConnectionSide == ConnectionSideEnum.Undefined)
                 ConnectionSide = ConnectionSideEnum.Server;
             else
                 throw new InvalidOperationException();
-            return this;
         }
-        public virtual TransferContract AsClient()
+        protected void AsClient()
         {
             if (ConnectionSide == ConnectionSideEnum.Undefined)
                 ConnectionSide = ConnectionSideEnum.Client;
             else
                 throw new InvalidOperationException();
-            return this;
         }
 
         protected enum ConnectionSideEnum

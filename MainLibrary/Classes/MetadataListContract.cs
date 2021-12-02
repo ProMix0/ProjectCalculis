@@ -23,7 +23,7 @@ namespace MainLibrary.Classes
             AsClient();
         }
 
-        protected override Task<List<IWorkMetadata>> RequestData(BinaryReader reader)
+        protected override Task<List<IWorkMetadata>> ReceiveData(BinaryReader reader)
         {
             int count = reader.ReadInt32();
             List<IWorkMetadata> result = new();

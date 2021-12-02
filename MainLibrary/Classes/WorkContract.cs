@@ -14,8 +14,8 @@ namespace MainLibrary.Classes
     {
         private DirectoryInfo worksDirectory;
 
-        public WorkContract(DirectoryInfo worksDirectory) : base("name",
-                                                                 new(@"GET (\w+)"),
+        public WorkContract(DirectoryInfo worksDirectory) : base("WORK name",
+                                                                 new(@"WORK (\w+)"),
                                                                  new string[] { "name" },
                                                                  null)
         {
@@ -23,8 +23,8 @@ namespace MainLibrary.Classes
             this.worksDirectory = worksDirectory;
         }
 
-        public WorkContract(Func<string[], IWork> onSend) : base("name",
-                                                                 new(@"GET (\w+)"),
+        public WorkContract(Func<string[], IWork> onSend) : base("WORK name",
+                                                                 new(@"WORK (\w+)"),
                                                                  new string[] { "name" },
                                                                  onSend)
         {
@@ -58,7 +58,7 @@ namespace MainLibrary.Classes
         //}
 
 
-        protected async override Task<IWork> RequestData(BinaryReader reader)
+        protected async override Task<IWork> ReceiveData(BinaryReader reader)
         {
             string workName = Args[0];
             DirectoryInfo directory = worksDirectory.CreateSubdirectory(workName);

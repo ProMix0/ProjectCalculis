@@ -14,8 +14,10 @@ namespace LifeWork
             for (int i = 0; i < fieldSize; i++)
                 for (int j = 0; j < fieldSize; j++)
                     input[i, j] = args[fieldSize * i + j] > 0;
+
             Board board = new(fieldSize, fieldSize, input);
             board.Turn(10);
+
             byte[] answer = new byte[fieldSize * fieldSize];
             for (int i = 0; i < fieldSize; i++)
                 for (int j = 0; j < fieldSize; j++)

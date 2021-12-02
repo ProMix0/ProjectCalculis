@@ -12,7 +12,7 @@ namespace ClientShell
         public ViewModel(IClientModel model)
         {
             this.model = model;
-            ExecuteCommand = new(async parameter => await model.ExecuteAsync(parameter as IWorkMetadata),
+            ExecuteCommand = new(async parameter => await model.Execute(parameter as IWorkMetadata),
                                  parameter => parameter != null);
         }
 

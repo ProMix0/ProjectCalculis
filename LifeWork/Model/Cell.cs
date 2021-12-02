@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LifeWork.Model
 {
-    public class Cell
+    class Cell
     {
         public bool IsAlive;
         public List<Cell> Neighbors { get; private set; } = new();
