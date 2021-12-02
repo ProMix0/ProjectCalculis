@@ -12,24 +12,22 @@ namespace MainLibrary.Abstractions
     public abstract class GetContract<T> : TransferContract
         where T:class
     {
-        private readonly Func<string[], T> onSend;
+        private readonly Func<Dictionary<string, string>, T> onSend;
 
-        protected GetContract(string requestTemplate, Regex requestRegex, string[] associations, Func<string[], T> onSend) : base(requestTemplate, requestRegex, associations)
+        protected GetContract(string requestTemplate, Regex requestRegex, Func<Dictionary<string, string>, T> onSend) : base(requestTemplate, requestRegex)
         {
             this.onSend = onSend;
         }
 
-        public Task<T> RequestData(Stream stream, string[] args)
+        public Task<T> RequestData(Stream stream, Dictionary<string,string> args)
         {
             if (ConnectionSide != ConnectionSideEnum.Client) throw new InvalidOperationException();
-            args ??= new string[0];
-            Args = args;
 
             BinaryReader reader = new(stream, Encoding.UTF8, true);
             using BinaryWriter writer = new(stream, Encoding.UTF8, true);
             string request = requestTemplate;
-            for (int i = 0; i < args.Length; i++)
-                request = request.Replace(associations[i], args[i]);
+            foreach (var arg in args)
+                request = request.Replace(arg.Key, arg.Value);
             writer.Write($"GET {request}");
             return ReceiveData(reader).ContinueWith(task=>
             {

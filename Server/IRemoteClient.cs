@@ -8,6 +8,9 @@ namespace MainLibrary.Interfaces
 {
     public interface IRemoteClient:IDisposable
     {
-        Func<string,IWork> GetWork { set; }
+        Func<string, byte[]> GetArgs { set; }
+        Func<string, IWork> GetWork { set; }
+        Func<List<IWorkMetadata>> GetWorksList { set; }
+        Action<byte[], string> ReceiveResult { set; }
     }
 }

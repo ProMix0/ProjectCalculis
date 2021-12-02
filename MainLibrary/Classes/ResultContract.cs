@@ -12,12 +12,12 @@ namespace MainLibrary.Classes
 {
     public class ResultContract : PostContract<byte[]>
     {
-        public ResultContract(Action<byte[],string[]> onReceive) : base("RESULT name", new(@"POST RESULT (\w+)"), new string[] { "name" },onReceive)
+        public ResultContract(Action<byte[], Dictionary<string, string>> onReceive) : base("RESULT name", new(@"POST RESULT (?<name>\w+)"), onReceive)
         {
             AsServer();
         }
 
-        public ResultContract() : base("RESULT name", new(@"POST RESULT (\w+)"), new string[] { "name" }, null)
+        public ResultContract() : base("RESULT name", new(@"POST RESULT (?<name>\w+)"), null)
         {
             AsClient();
         }

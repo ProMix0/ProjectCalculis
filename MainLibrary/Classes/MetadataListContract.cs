@@ -13,12 +13,12 @@ namespace MainLibrary.Classes
     public class MetadataListContract : GetContract<List<IWorkMetadata>>
     {
 
-        public MetadataListContract(Func<string[], List<IWorkMetadata>> onSend) :base("WORKS", new("GET WORKS"),new string[0],onSend)
+        public MetadataListContract(Func<Dictionary<string, string>, List<IWorkMetadata>> onSend) :base("WORKS", new("GET WORKS"),onSend)
         {
             AsServer();
         }
 
-        public MetadataListContract() : base("WORKS", new("GET WORKS"), new string[0], null)
+        public MetadataListContract() : base("WORKS", new("GET WORKS"),  null)
         {
             AsClient();
         }

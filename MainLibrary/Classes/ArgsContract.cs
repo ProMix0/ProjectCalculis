@@ -10,11 +10,11 @@ namespace MainLibrary.Classes
 {
     public class ArgsContract : GetContract<byte[]>
     {
-        public ArgsContract() : base("ARGS name", new(@"ARGS (\w+)"), new string[] { "name" }, null)
+        public ArgsContract() : base("ARGS name", new(@"ARGS (?<name>\w+)"),  null)
         {
             AsClient();
         }
-        public ArgsContract(Func<string[], byte[]> onSend) : base("ARGS name", new(@"ARGS (\w+)"), new string[] { "name" }, onSend)
+        public ArgsContract(Func<Dictionary<string, string>, byte[]> onSend) : base("ARGS name", new(@"ARGS (?<name>\w+)"),  onSend)
         {
             AsServer();
         }

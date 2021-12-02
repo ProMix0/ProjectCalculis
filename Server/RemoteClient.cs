@@ -17,12 +17,14 @@ using System.Xml.Serialization;
 
 namespace MainLibrary.Classes
 {
+    
+
     public class RemoteClient : IRemoteClient
     {
         public Func<string, IWork> GetWork { set; private get; }
-        public Func<string, byte[]> GetArgs{ set; private get; }
+        public Func<string, byte[]> GetArgs { set; private get; }
         public Func<List<IWorkMetadata>> GetWorksList { set; private get; }
-        public Action<byte[],string> ReceiveResult { set; private get; }
+        public Action<byte[], string> ReceiveResult { set; private get; }
         private Task listenTask;
         private CancellationTokenSource token;
         private readonly Stream stream;
@@ -64,10 +66,10 @@ namespace MainLibrary.Classes
 
         private void Listen()
         {
-            metadataContract = new(array => GetWorksList());
-            workContract = new(array => GetWork(array[0]));
-            resultContract = new((result, args) => ReceiveResult(result,args[0]));
-            argsContract = new(args => GetArgs(args[0]));
+            metadataContract = new(args => GetWorksList());
+            workContract = new(args => GetWork(args["name"]));
+            resultContract = new((result, args) => ReceiveResult(result, args["name"]));
+            argsContract = new(args => GetArgs(args["name"]));
             try
             {
                 while (true)
@@ -97,7 +99,7 @@ namespace MainLibrary.Classes
                             }
                             break;
                         case string _ when request.StartsWith("POST"):
-                            if(resultContract.IsRequest(request))
+                            if (resultContract.IsRequest(request))
                             {
                                 resultContract.ReceiveData(stream).Wait();
                                 break;
