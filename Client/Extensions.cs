@@ -17,10 +17,10 @@ namespace Client
             return builder.ConfigureServices((context, services) =>
             {
                 services
-                .Configure<PathOptions>(context.Configuration.GetSection(PathOptions.Path))
-                .Configure<Options>(context.Configuration)
-                .AddScoped<IRemoteServer, RemoteServer>()
-                .AddSingleton<IClientModel, ClientModel>();
+                    .Configure<PathOptions>(context.Configuration.GetSection(PathOptions.Path))
+                    .Configure<Options>(context.Configuration)
+                    .AddScoped<IRemoteServer, RemoteServer>()
+                    .AddSingleton<IClientModel, ClientModel>();
             });
         }
     }
