@@ -59,7 +59,7 @@ namespace MainLibrary.Classes
             listenTask = Task.Run(Listen, token.Token);
         }
 
-        private MetadataListContract metadataContract;
+        private MetadataContract metadataContract;
         private WorkContract workContract;
         private ResultContract resultContract;
         private ArgsContract argsContract;

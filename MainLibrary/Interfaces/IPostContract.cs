@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace MainLibrary.Interfaces
 {
-    public interface IRemoteClient:IDisposable
+    public interface IPostContract
     {
-        void SetContracts();
+        Task ReceiveData(Stream stream);
+        bool IsRequest(string request);
     }
 }

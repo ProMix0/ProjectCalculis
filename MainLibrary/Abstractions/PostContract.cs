@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MainLibrary.Abstractions
 {
-    public abstract class PostContract<T> : TransferContract
+    public abstract class PostContract<T> : TransferContract,IPostContract
         where T : class
     {
         private readonly Action<T, Dictionary<string, string>> onReceive;

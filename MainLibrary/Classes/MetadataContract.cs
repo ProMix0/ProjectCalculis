@@ -10,15 +10,15 @@ using System.Threading.Tasks;
 
 namespace MainLibrary.Classes
 {
-    public class MetadataListContract : GetContract<List<IWorkMetadata>>
+    public class MetadataContract : GetContract<List<IWorkMetadata>>
     {
 
-        public MetadataListContract(Func<Dictionary<string, string>, List<IWorkMetadata>> onSend) :base("WORKS", new("GET WORKS"),onSend)
+        public MetadataContract(Func<Dictionary<string, string>, List<IWorkMetadata>> onSend) :base("WORKS", new("GET WORKS"),onSend)
         {
             AsServer();
         }
 
-        public MetadataListContract() : base("WORKS", new("GET WORKS"),  null)
+        public MetadataContract() : base("WORKS", new("GET WORKS"),  null)
         {
             AsClient();
         }

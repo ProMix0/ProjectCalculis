@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MainLibrary.Abstractions
 {
-    public abstract class GetContract<T> : TransferContract
+    public abstract class GetContract<T> : TransferContract,IGetContract
         where T:class
     {
         private readonly Func<Dictionary<string, string>, T> onSend;

@@ -17,4 +17,12 @@ namespace Server
 
         public string[] WorksDirectories { get; set; }
     }
+
+    public class ContractsOptions
+    {
+        public const string Contracts = "Contracts";
+
+        public string[] GET { get; set; }
+        public string[] POST { get; set; }
+    }
 }

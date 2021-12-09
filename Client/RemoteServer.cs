@@ -20,7 +20,7 @@ namespace Client
         private TcpClient client;
         private DirectoryInfo worksDirectory;
 
-        private MetadataListContract metadataContract;
+        private MetadataContract metadataContract;
         private WorkContract workContract;
         private ResultContract resultContract;
         private ArgsContract argsContract;
