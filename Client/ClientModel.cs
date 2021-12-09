@@ -26,8 +26,7 @@ namespace Client
         {
             get
             {
-                if (worksMetas == null)
-                    worksMetas = server.GetWorksList().Result.AsReadOnly();
+                worksMetas ??= server.GetWorksList().Result.AsReadOnly();
                 return worksMetas;
             }
         }
@@ -42,13 +41,14 @@ namespace Client
 
         private async Task<IWork> GetWork(IWorkMetadata metadata)
         {
-            if (works == null) works = Work.CreateWorksFrom(worksDirectory);
+            if (works == null)
+                works = Work.CreateWorksFrom(worksDirectory);
             IWork work = works.Find(work => work.Name.Equals(metadata.Name));
             if (work == null || !work.Metadata.Equals(metadata))
             {
                 worksDirectory.CreateSubdirectory(metadata.Name).Delete(true);
                 work = await server.DownloadWork(metadata);
-                /*if (work != null)*/ works.Remove(work);
+                works.Remove(work);
                 works.Add(work);
             }
             return work;
