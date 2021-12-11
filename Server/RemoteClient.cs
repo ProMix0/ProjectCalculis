@@ -17,16 +17,19 @@ using System.Xml.Serialization;
 
 namespace MainLibrary.Classes
 {
+    
+
     public class RemoteClient : IRemoteClient
     {
         public Func<string, IWork> GetWork { set; private get; }
+        public Func<string, byte[]> GetArgs { set; private get; }
         public Func<List<IWorkMetadata>> GetWorksList { set; private get; }
-        public Action<byte[],string> ReceiveResult { set; private get; }
+        public Action<byte[], string> ReceiveResult { set; private get; }
         private Task listenTask;
         private CancellationTokenSource token;
         private readonly Stream stream;
         private BinaryReader reader;
-        private BinaryWriter writer;
+        //private BinaryWriter writer;
         private TcpClient client;
 
         public RemoteClient(TcpClient client)
@@ -56,15 +59,17 @@ namespace MainLibrary.Classes
             listenTask = Task.Run(Listen, token.Token);
         }
 
-        private MetadataListContract metadataContract;
+        private MetadataContract metadataContract;
         private WorkContract workContract;
         private ResultContract resultContract;
+        private ArgsContract argsContract;
 
         private void Listen()
         {
-            metadataContract = new(array => GetWorksList());
-            workContract = new(array => GetWork(array[0]));
-            resultContract = new((result, args) => ReceiveResult(result,args[0]));
+            metadataContract = new(args => GetWorksList());
+            workContract = new(args => GetWork(args["name"]));
+            resultContract = new((result, args) => ReceiveResult(result, args["name"]));
+            argsContract = new(args => GetArgs(args["name"]));
             try
             {
                 while (true)
@@ -87,9 +92,14 @@ namespace MainLibrary.Classes
                                 workContract.SendData(stream).Wait();
                                 break;
                             }
+                            if (argsContract.IsRequest(request))
+                            {
+                                argsContract.SendData(stream).Wait();
+                                break;
+                            }
                             break;
                         case string _ when request.StartsWith("POST"):
-                            if(resultContract.IsRequest(request))
+                            if (resultContract.IsRequest(request))
                             {
                                 resultContract.ReceiveData(stream).Wait();
                                 break;
@@ -108,7 +118,7 @@ namespace MainLibrary.Classes
         {
             token.Cancel();
             reader.Dispose();
-            writer.Dispose();
+            //writer.Dispose();
             stream.Dispose();
             client.Dispose();
         }

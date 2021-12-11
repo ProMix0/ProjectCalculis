@@ -10,20 +10,20 @@ using System.Threading.Tasks;
 
 namespace MainLibrary.Classes
 {
-    public class MetadataListContract : GetContract<List<IWorkMetadata>>
+    public class MetadataContract : GetContract<List<IWorkMetadata>>
     {
 
-        public MetadataListContract(Func<string[], List<IWorkMetadata>> onSend) :base("WORKS", new("GET WORKS"),new string[0],onSend)
+        public MetadataContract(Func<Dictionary<string, string>, List<IWorkMetadata>> onSend) :base("WORKS", new("GET WORKS"),onSend)
         {
             AsServer();
         }
 
-        public MetadataListContract() : base("WORKS", new("GET WORKS"), new string[0], null)
+        public MetadataContract() : base("WORKS", new("GET WORKS"),  null)
         {
             AsClient();
         }
 
-        protected override Task<List<IWorkMetadata>> RequestData(BinaryReader reader)
+        protected override Task<List<IWorkMetadata>> ReceiveData(BinaryReader reader)
         {
             int count = reader.ReadInt32();
             List<IWorkMetadata> result = new();

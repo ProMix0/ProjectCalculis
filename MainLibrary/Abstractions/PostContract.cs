@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace MainLibrary.Abstractions
 {
-    public abstract class PostContract<T> : TransferContract
+    public abstract class PostContract<T> : TransferContract,IPostContract
         where T : class
     {
-        private readonly Action<T,string[]> onReceive;
+        private readonly Action<T, Dictionary<string, string>> onReceive;
 
-        protected PostContract(string requestTemplate, Regex requestRegex, string[] associations, Action<T,string[]> onReceive) : base(requestTemplate, requestRegex, associations)
+        protected PostContract(string requestTemplate, Regex requestRegex, Action<T, Dictionary<string, string>> onReceive) : base(requestTemplate, requestRegex)
         {
             this.onReceive = onReceive;
         }
@@ -29,26 +29,17 @@ namespace MainLibrary.Abstractions
 
         protected abstract Task<T> ReceiveData(BinaryReader reader);
 
-        public Task SendData(Stream stream,T data, string[] args)
+        public Task SendData(Stream stream,T data, Dictionary<string,string> args)
         {
             if (ConnectionSide != ConnectionSideEnum.Client) throw new InvalidOperationException();
 
             using BinaryReader reader = new(stream, Encoding.UTF8, true);
             using BinaryWriter writer = new(stream, Encoding.UTF8, true);
             string request = requestTemplate;
-            for (int i = 0; i < args.Length; i++)
-                request = request.Replace(associations[i], args[i]);
+            foreach (var arg in args)
+                request = request.Replace(arg.Key, arg.Value);
             writer.Write($"POST {request}");
             return SendData(writer, data);
-        }
-
-        public override sealed PostContract<T> AsServer()
-        {
-            return (PostContract < T > )base.AsServer();
-        }
-        public override sealed PostContract<T> AsClient()
-        {
-            return (PostContract<T>)base.AsClient();
         }
 
         protected abstract Task SendData(BinaryWriter writer, T data);

@@ -12,9 +12,10 @@ namespace MainLibrary.Interfaces
     {
         void ConnectTo(IPEndPoint endPoint);
 
-        Task<List<IWorkMetadata>> GetWorksListAsync();
+        Task<List<IWorkMetadata>> GetWorksList();
+        Task<byte[]> GetArgs(IWorkMetadata metadata);
 
-        Task<IWork> DownloadWorkAsync(IWorkMetadata workMetadata);
+        Task<IWork> DownloadWork(IWorkMetadata workMetadata);
 
         Task SendWorkResult(IWorkMetadata workMetadata, byte[] result);
     }

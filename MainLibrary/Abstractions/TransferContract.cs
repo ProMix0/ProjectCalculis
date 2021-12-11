@@ -12,17 +12,15 @@ namespace MainLibrary.Abstractions
         protected readonly string requestTemplate;
         protected readonly Regex requestRegex;
 
-        protected readonly string[] associations;
 
-        protected TransferContract(string requestTemplate, Regex requestRegex, string[] associations)
+        protected TransferContract(string requestTemplate, Regex requestRegex)
         {
             this.requestTemplate = requestTemplate;
             this.requestRegex = requestRegex;
-            this.associations = associations;
 
         }
 
-        protected string[] Args { get;  set; } 
+        protected Dictionary<string, string> Args { get; set; } = new();
 
         protected ConnectionSideEnum ConnectionSide { get; private set; } = ConnectionSideEnum.Undefined;
 
@@ -33,34 +31,33 @@ namespace MainLibrary.Abstractions
             if (requestRegex.IsMatch(request))
             {
                 Match match = requestRegex.Match(request);
-                List<string> groups = new();
+                Args = new();
                 for (int i = 1; i < match.Groups.Count; i++)
-                    groups.Add(match.Groups[i].Value);
-                Args = groups.ToArray();
+                {
+                    Group group = match.Groups[i];
+                    Args.Add(group.Name, group.Value);
+                }
                 return true;
             }
             else
             {
-                Args = Array.Empty<string>();
                 return false;
             }
         }
 
-        public virtual TransferContract AsServer()
+        protected void AsServer()
         {
             if (ConnectionSide == ConnectionSideEnum.Undefined)
                 ConnectionSide = ConnectionSideEnum.Server;
             else
                 throw new InvalidOperationException();
-            return this;
         }
-        public virtual TransferContract AsClient()
+        protected void AsClient()
         {
             if (ConnectionSide == ConnectionSideEnum.Undefined)
                 ConnectionSide = ConnectionSideEnum.Client;
             else
                 throw new InvalidOperationException();
-            return this;
         }
 
         protected enum ConnectionSideEnum

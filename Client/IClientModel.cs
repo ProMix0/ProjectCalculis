@@ -8,6 +8,6 @@ namespace Client
     {
         IReadOnlyCollection<IWorkMetadata> WorksMetas { get; }
 
-        Task ExecuteAsync(IWorkMetadata metadata);
+        Task Execute(IWorkMetadata metadata);
     }
 }

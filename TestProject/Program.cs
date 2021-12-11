@@ -13,7 +13,9 @@ namespace TestProject
         {
             Console.WriteLine("It's Main(), dumb -_-");
 
-            SymmetricAlgorithm cipher = Rijndael.Create();
+            SymmetricAlgorithm cipher = Aes.Create();
+            //cipher.Mode = CipherMode.CTS;
+            //cipher.BlockSize = 8;
             cipher.GenerateIV();
             cipher.GenerateKey();
 

@@ -9,36 +9,34 @@ using System.Threading.Tasks;
 
 namespace MainLibrary.Abstractions
 {
-    public abstract class GetContract<T> : TransferContract
+    public abstract class GetContract<T> : TransferContract,IGetContract
         where T:class
     {
-        private readonly Func<string[], T> onSend;
+        private readonly Func<Dictionary<string, string>, T> onSend;
 
-        protected GetContract(string requestTemplate, Regex requestRegex, string[] associations, Func<string[], T> onSend) : base(requestTemplate, requestRegex, associations)
+        protected GetContract(string requestTemplate, Regex requestRegex, Func<Dictionary<string, string>, T> onSend) : base(requestTemplate, requestRegex)
         {
             this.onSend = onSend;
         }
 
-        public Task<T> RequestData(Stream stream, string[] args)
+        public Task<T> RequestData(Stream stream, Dictionary<string,string> args)
         {
             if (ConnectionSide != ConnectionSideEnum.Client) throw new InvalidOperationException();
-            args ??= new string[0];
-            Args = args;
 
             BinaryReader reader = new(stream, Encoding.UTF8, true);
             using BinaryWriter writer = new(stream, Encoding.UTF8, true);
             string request = requestTemplate;
-            for (int i = 0; i < args.Length; i++)
-                request = request.Replace(associations[i], args[i]);
+            foreach (var arg in args)
+                request = request.Replace(arg.Key, arg.Value);
             writer.Write($"GET {request}");
-            return RequestData(reader).ContinueWith(task=>
+            return ReceiveData(reader).ContinueWith(task=>
             {
                 reader.Dispose();
                 return task.Result;
             });
         }
 
-        protected abstract Task<T> RequestData(BinaryReader reader);
+        protected abstract Task<T> ReceiveData(BinaryReader reader);
 
         public Task SendData(Stream stream)
         {
@@ -46,15 +44,6 @@ namespace MainLibrary.Abstractions
 
             using BinaryWriter writer = new(stream, Encoding.UTF8, true);
             return SendData(writer, onSend?.Invoke(Args));
-        }
-
-        public override sealed GetContract<T> AsServer()
-        {
-            return (GetContract<T>)base.AsServer();
-        }
-        public override sealed GetContract<T> AsClient()
-        {
-            return (GetContract<T>)base.AsClient();
         }
 
         protected abstract Task SendData(BinaryWriter writer, T data);
