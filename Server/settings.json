@@ -3,11 +3,11 @@
     "WorksDirectories": [ "C:\\Users\\Misha\\Desktop\\Works", "C:\\Users\\Ученик\\Documents\\ProjectCalculis" ]
   },
   "Contracts": {
-    "GET": {
+    "GET": [
 
-    },
-    "POST": {
+    ],
+    "POST": [
 
-    }
+    ]
   }
 }

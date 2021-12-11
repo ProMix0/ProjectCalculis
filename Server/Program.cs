@@ -25,6 +25,7 @@ namespace Server
                 .ConfigureServices((context, services) =>
                 {
                     services
+                    .Configure<ContractsOptions>(context.Configuration.GetSection(ContractsOptions.Path))
                     .Configure<PathOptions>(context.Configuration.GetSection(PathOptions.Path))
                     .Configure<Options>(context.Configuration)
                     .AddHostedService<Worker>();

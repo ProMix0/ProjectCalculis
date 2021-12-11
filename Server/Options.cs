@@ -9,6 +9,7 @@ namespace Server
     public class Options
     {
         public PathOptions Path { get; set; }
+        public ContractsOptions Contracts { get; set; }
     }
 
     public class PathOptions
@@ -20,7 +21,7 @@ namespace Server
 
     public class ContractsOptions
     {
-        public const string Contracts = "Contracts";
+        public const string Path = "Contracts";
 
         public string[] GET { get; set; }
         public string[] POST { get; set; }
