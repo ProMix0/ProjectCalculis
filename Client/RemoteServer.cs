@@ -70,12 +70,12 @@ namespace Client
 
         public Task<IWork> DownloadWork(IWorkMetadata workMetadata)
         {
-            return workContract.RequestData(stream,new string[] { workMetadata.Name });
+            return workContract.RequestData(stream,new(){ { "name", workMetadata.Name } });
         }
 
         public Task<byte[]> GetArgs(IWorkMetadata metadata)
         {
-            return argsContract.RequestData(stream,new string[] { metadata.Name });
+            return argsContract.RequestData(stream,new(){ { "name", metadata.Name } });
         }
 
         public Task<List<IWorkMetadata>> GetWorksList()
@@ -85,7 +85,7 @@ namespace Client
 
         public Task SendWorkResult(IWorkMetadata metadata, byte[] result)
         {
-            return resultContract.SendData(stream, result, new string[] { metadata.Name });
+            return resultContract.SendData(stream, result, new(){ { "name", metadata.Name } });
         }
     }
 }

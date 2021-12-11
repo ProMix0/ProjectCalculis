@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 
 namespace MainLibrary.Abstractions
 {
-    public abstract class GetContract<T> : TransferContract,IGetContract
-        where T:class
+    public abstract class GetContract<T> : TransferContract, IGetContract
+        where T : class
     {
         private readonly Func<Dictionary<string, string>, T> onSend;
 
@@ -19,9 +19,11 @@ namespace MainLibrary.Abstractions
             this.onSend = onSend;
         }
 
-        public Task<T> RequestData(Stream stream, Dictionary<string,string> args)
+        public Task<T> RequestData(Stream stream, Dictionary<string, string> args)
         {
             if (ConnectionSide != ConnectionSideEnum.Client) throw new InvalidOperationException();
+            args ??= new();
+            Args = args;
 
             BinaryReader reader = new(stream, Encoding.UTF8, true);
             using BinaryWriter writer = new(stream, Encoding.UTF8, true);
@@ -29,7 +31,7 @@ namespace MainLibrary.Abstractions
             foreach (var arg in args)
                 request = request.Replace(arg.Key, arg.Value);
             writer.Write($"GET {request}");
-            return ReceiveData(reader).ContinueWith(task=>
+            return ReceiveData(reader).ContinueWith(task =>
             {
                 reader.Dispose();
                 return task.Result;

@@ -4,10 +4,12 @@
   },
   "Contracts": {
     "GET": [
-
+      "ArgsContract",
+      "MetadataContract",
+      "WorkContract"
     ],
     "POST": [
-
+      "ResultContract"
     ]
   }
 }

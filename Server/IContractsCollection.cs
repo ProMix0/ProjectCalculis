@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    interface IContractsCollection
+    public interface IContractsCollection
     {
         IReadOnlyList<IGetContract> GetContracts { get; }
         IReadOnlyList<IPostContract> PostContracts { get; }

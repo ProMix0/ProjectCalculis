@@ -28,7 +28,7 @@ namespace TestWork
 
         public byte[] GetArgument()
         {
-            return null;
+            return new byte[1];
         }
     }
 }

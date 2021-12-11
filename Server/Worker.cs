@@ -48,11 +48,8 @@ namespace Server
             listener.Start();
             while (true)
             {
-                RemoteClient client = new(await listener.AcceptTcpClientAsync());
-                client.GetWorksList = () => works.Select(work => work.Metadata).ToList();
-                client.GetWork = name => works.Find(work => work.Name.Equals(name)).Work;
-                client.ReceiveResult = (result, name) => works.Find(work => work.Name.Equals(name)).Server.SetResult(result);
-                client.GetArgs = name => works.Find(work => work.Name.Equals(name)).Server.GetArgument();
+                IRemoteClient client = new RemoteClient(await listener.AcceptTcpClientAsync());
+                client.SetContracts(contractsCollection);
             };
 
         }

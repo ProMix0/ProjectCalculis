@@ -15,22 +15,20 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace MainLibrary.Classes
+namespace Server
 {
-    
+
 
     public class RemoteClient : IRemoteClient
     {
-        public Func<string, IWork> GetWork { set; private get; }
-        public Func<string, byte[]> GetArgs { set; private get; }
-        public Func<List<IWorkMetadata>> GetWorksList { set; private get; }
-        public Action<byte[], string> ReceiveResult { set; private get; }
         private Task listenTask;
         private CancellationTokenSource token;
         private readonly Stream stream;
         private BinaryReader reader;
         //private BinaryWriter writer;
         private TcpClient client;
+
+        private IContractsCollection contracts;
 
         public RemoteClient(TcpClient client)
         {
@@ -59,51 +57,30 @@ namespace MainLibrary.Classes
             listenTask = Task.Run(Listen, token.Token);
         }
 
-        private MetadataContract metadataContract;
-        private WorkContract workContract;
-        private ResultContract resultContract;
-        private ArgsContract argsContract;
-
         private void Listen()
         {
-            metadataContract = new(args => GetWorksList());
-            workContract = new(args => GetWork(args["name"]));
-            resultContract = new((result, args) => ReceiveResult(result, args["name"]));
-            argsContract = new(args => GetArgs(args["name"]));
             try
             {
                 while (true)
                 {
-                    //while (true)
-                    //    foreach(var @byte in reader.ReadBytes(16))
-                    //    Console.WriteLine(@byte);
-
                     string request = reader.ReadString();
                     switch (request)
                     {
                         case string _ when request.StartsWith("GET"):
-                            if (metadataContract.IsRequest(request))
-                            {
-                                metadataContract.SendData(stream).Wait();
-                                break;
-                            }
-                            if (workContract.IsRequest(request))
-                            {
-                                workContract.SendData(stream).Wait();
-                                break;
-                            }
-                            if (argsContract.IsRequest(request))
-                            {
-                                argsContract.SendData(stream).Wait();
-                                break;
-                            }
+                            foreach (var get in contracts.GetContracts)
+                                if (get.IsRequest(request))
+                                {
+                                    get.SendData(stream).Wait();
+                                    break;
+                                }
                             break;
                         case string _ when request.StartsWith("POST"):
-                            if (resultContract.IsRequest(request))
-                            {
-                                resultContract.ReceiveData(stream).Wait();
-                                break;
-                            }
+                            foreach (var post in contracts.PostContracts)
+                                if (post.IsRequest(request))
+                                {
+                                    post.ReceiveData(stream).Wait();
+                                    break;
+                                }
                             break;
                     }
                 }
@@ -121,6 +98,11 @@ namespace MainLibrary.Classes
             //writer.Dispose();
             stream.Dispose();
             client.Dispose();
+        }
+
+        public void SetContracts(IContractsCollection contracts)
+        {
+            this.contracts = contracts;
         }
     }
 }

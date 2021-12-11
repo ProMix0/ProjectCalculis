@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MainLibrary.Interfaces
+namespace Server
 {
     public interface IRemoteClient:IDisposable
     {
-        void SetContracts();
+        void SetContracts(IContractsCollection contracts);
     }
 }
