@@ -2,6 +2,7 @@
 using MainLibrary.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ namespace Server
         private List<ServerWork> works = new();
         private IContractsCollection contractsCollection;
 
-        public Worker(IOptions<Options> options)
+        public Worker(IOptions<Options> options, Logger<Worker> logger)
         {
             path = options.Value.Path;
             contracts = options.Value.Contracts;

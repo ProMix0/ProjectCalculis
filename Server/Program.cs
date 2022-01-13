@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Configuration;
 using System.IO;
@@ -29,6 +30,10 @@ namespace Server
                     .Configure<PathOptions>(context.Configuration.GetSection(PathOptions.Path))
                     .Configure<Options>(context.Configuration)
                     .AddHostedService<Worker>();
+                })
+                .ConfigureLogging(logging =>
+                {
+                    logging.AddConsole();
                 })
                 .RunConsoleAsync();
         }
