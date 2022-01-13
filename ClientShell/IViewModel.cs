@@ -7,5 +7,7 @@ namespace ClientShell
     {
         RelayCommand ExecuteCommand { get; }
         IReadOnlyCollection<IWorkMetadata> Metadatas { get; }
+
+        bool CanExecuteWork { get; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using MainLibrary.Interfaces;
 using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
@@ -12,18 +13,18 @@ namespace TestWork
     public class Program : IClientCode, IServerCode
     {
         
-        public Task<byte[]> Entrypoint(byte[] args)
+        public async Task<byte[]> Entrypoint(byte[] args)
         {
-            //MessageBox.Show
-            //Console.WriteLine("TestWork World!");
-            //Console.WriteLine("It's really work?");
-            //Console.WriteLine(argsObject);
-            return Task.FromResult(new byte[] { 0, 9, 8 });
+            await Task.Delay(10000);
+
+            return new byte[] { 0, 9, 8 };
         }
 
         public void SetResult(byte[] result)
         {
-            Console.WriteLine("Receive result");
+            Console.Write("Receive result:");
+            foreach (var n in result.Concat("\n\r".Cast<byte>()))
+                Console.Write($" {n}");
         }
 
         public byte[] GetArgument()

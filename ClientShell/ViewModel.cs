@@ -12,8 +12,13 @@ namespace ClientShell
         public ViewModel(IClientModel model)
         {
             this.model = model;
-            ExecuteCommand = new(async parameter => await model.Execute(parameter as IWorkMetadata),
-                                 parameter => parameter != null);
+            ExecuteCommand = new(async parameter =>
+                                {
+                                    CanExecuteWork = false;
+                                    await model.Execute(parameter as IWorkMetadata);
+                                    CanExecuteWork = true;
+                                },
+                                 parameter => parameter != null && CanExecuteWork);
         }
 
         private IClientModel model;
@@ -21,5 +26,7 @@ namespace ClientShell
         public IReadOnlyCollection<IWorkMetadata> Metadatas => model.WorksMetas;
 
         public RelayCommand ExecuteCommand { get; }
+
+        public bool CanExecuteWork { get; set; } = true;
     }
 }

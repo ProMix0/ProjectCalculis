@@ -22,7 +22,7 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <Button Grid.Column="1" Content="Execute" Command="{Binding ExecuteCommand}" CommandParameter="{Binding ElementName=listView,Path=SelectedItem}"/>
+        <Button Grid.Column="1" Content="Execute" Command="{Binding ExecuteCommand}" CommandParameter="{Binding ElementName=listView,Path=SelectedItem}" IsEnabled="{Binding CanExecuteWork}"/>
         <StackPanel Grid.Row="1" Grid.Column="1" DataContext="{Binding ElementName=listView,Path=SelectedItem}">
             <TextBlock Text="{Binding Name}"/>
             <TextBlock Text="{Binding Name}"/>
