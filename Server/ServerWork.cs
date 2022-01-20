@@ -23,12 +23,13 @@ namespace Server
             Server = server;
         }
 
-        public static ServerWork TryCreate(DirectoryInfo directory)
+        internal static bool TryCreate(DirectoryInfo directory, out ServerWork outWork)
         {
-            if (!directory.Exists) return null;
+            outWork = null;
+
+            if (!directory.Exists) return false;
 
             IWork work = new Work(directory.Name, directory);
-            if (work == null) return null;
 
             string fullName = directory.EnumerateFiles($"{directory.Name}.dll").First().FullName;
             Assembly assembly = Assembly.LoadFile(fullName);
@@ -38,9 +39,10 @@ namespace Server
                 .GetExportedTypes()
                 .Where(type => type.IsAssignableTo(typeof(IServerCode)))
                 .First().FullName);
-            if (server == null) return null;
+            if (server == null) return false;
 
-            return new(work, server);
+            outWork = new(work, server);
+            return true;
         }
     }
 }

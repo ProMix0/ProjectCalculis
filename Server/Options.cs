@@ -8,7 +8,7 @@ namespace Server
 {
     public class Options
     {
-        public PathOptions Path { get; set; }
+        public PathOptions Paths { get; set; }
         public ContractsOptions Contracts { get; set; }
     }
 

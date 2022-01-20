@@ -22,11 +22,13 @@ namespace Server
         private ContractsOptions contracts;
         private List<ServerWork> works = new();
         private IContractsCollection contractsCollection;
+        private readonly Logger<Worker> logger;
 
         public Worker(IOptions<Options> options, Logger<Worker> logger)
         {
-            path = options.Value.Path;
+            path = options.Value.Paths;
             contracts = options.Value.Contracts;
+            this.logger = logger;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -34,11 +36,21 @@ namespace Server
             foreach (var directory in path.WorksDirectories.Select(fullPath => new DirectoryInfo(fullPath)))
             {
                 if (directory.Exists)
+                {
+                    logger.LogInformation($"{directory.FullName} exists");
                     foreach (var work in directory.EnumerateDirectories("*", SearchOption.TopDirectoryOnly))
                     {
-                        ServerWork tempWork = ServerWork.TryCreate(work);
-                        if (tempWork != null) works.Add(tempWork);
+                        if (ServerWork.TryCreate(work, out ServerWork tempWork))
+                        {
+
+                            works.Add(tempWork);
+                        }
+                        else
+
                     }
+                }
+                else
+                    logger.LogInformation($"{directory.FullName} don't exists");
             }
             //works.Sort((x, y) => x.Name.CompareTo(y.Name));
 
