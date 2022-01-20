@@ -24,11 +24,13 @@ namespace Server
         private IContractsCollection contractsCollection;
         private readonly Logger<Worker> logger;
 
-        public Worker(IOptions<Options> options, Logger<Worker> logger)
+        public Worker(IOptions<Options> options, Logger<Worker> logger, Logger<ServerWork> serverLogger)
         {
             path = options.Value.Paths;
             contracts = options.Value.Contracts;
             this.logger = logger;
+
+            ServerWork.AddLogger(serverLogger);
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -42,11 +44,11 @@ namespace Server
                     {
                         if (ServerWork.TryCreate(work, out ServerWork tempWork))
                         {
-
+                            logger.LogInformation($"{work.Name} work successfuly created");
                             works.Add(tempWork);
                         }
                         else
-
+                            logger.LogInformation($"{work.Name} don't created");
                     }
                 }
                 else
@@ -59,6 +61,7 @@ namespace Server
             TcpListener listener = new(IPAddress.Any, 8008);
 
             listener.Start();
+            logger.LogInformation("Listener started");
             while (true)
             {
                 IRemoteClient client = new RemoteClient(await listener.AcceptTcpClientAsync());
@@ -70,27 +73,37 @@ namespace Server
         private void AddContracts()
         {
             ContractsCollection collection = new();
-            foreach(var get in contracts.GET)
+            foreach(var contractName in contracts.GET)
             {
-                switch (get)
+                switch (contractName)
                 {
                     case nameof(ArgsContract):
                         collection.Add(new ArgsContract(args => works.Find(work => work.Name.Equals(args["name"])).Server.GetArgument()));
+                        logger.LogInformation($"{nameof(ArgsContract)} added");
                         break;
                     case nameof(MetadataContract):
                         collection.Add(new MetadataContract(_ => works.Select(work => work.Metadata).ToList()));
+                        logger.LogInformation($"{nameof(MetadataContract)} added");
                         break;
                     case nameof(WorkContract):
                         collection.Add(new WorkContract(args => works.Find(work => work.Name.Equals(args["name"])).Work));
+                        logger.LogInformation($"{nameof(WorkContract)} added");
+                        break;
+                    default:
+                        logger.LogWarning($"Can't add contract: {contractName}");
                         break;
                 }
             }
-            foreach (var post in contracts.POST)
+            foreach (var contractName in contracts.POST)
             {
-                switch (post)
+                switch (contractName)
                 {
                     case nameof(ResultContract):
                         collection.Add(new ResultContract((result, args) => works.Find(work => work.Name.Equals(args["name"])).Server.SetResult(result)));
+                        logger.LogInformation($"{nameof(ResultContract)} added");
+                        break;
+                    default:
+                        logger.LogWarning($"Can't add contract: {contractName}");
                         break;
                 }
             }
@@ -99,6 +112,7 @@ namespace Server
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
+            logger.LogError("StopAsync() called");
             throw new NotImplementedException();
         }
     }

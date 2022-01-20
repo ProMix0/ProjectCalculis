@@ -1,6 +1,7 @@
 ﻿using MainLibrary.Interfaces;
 using MessagePack;
 using MessagePack.Resolvers;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -27,12 +28,13 @@ namespace Server
         private BinaryReader reader;
         //private BinaryWriter writer;
         private TcpClient client;
-
+        private readonly Logger<RemoteClient> logger;
         private IContractsCollection contracts;
 
-        public RemoteClient(TcpClient client)
+        public RemoteClient(TcpClient client, Logger<RemoteClient> logger)
         {
             this.client = client;
+            this.logger = logger;
             stream = client.GetStream();
 
             //https://habr.com/ru/post/497160/
@@ -66,7 +68,7 @@ namespace Server
                     string request = reader.ReadString();
                     switch (request)
                     {
-                        case string _ when request.StartsWith("GET"):
+                        case string when request.StartsWith("GET"):
                             foreach (var get in contracts.GetContracts)
                                 if (get.IsRequest(request))
                                 {
@@ -74,20 +76,28 @@ namespace Server
                                     break;
                                 }
                             break;
-                        case string _ when request.StartsWith("POST"):
-                            foreach (var post in contracts.PostContracts)
+                        case string when request.StartsWith("POST"):
+                            IReadOnlyList<IPostContract> postContracts = contracts.PostContracts;
+                            int count = postContracts.Count;
+                            foreach (var post in postContracts)
                                 if (post.IsRequest(request))
                                 {
                                     post.ReceiveData(stream).Wait();
                                     break;
                                 }
+                                else count--;
+                            if (count == 0) logger.LogWarning($"Contracts can't handle request: {request}");
+                            break;
+                        default:
+                            logger.LogWarning($"Undefined request: {request}");
                             break;
                     }
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                //Console.WriteLine(e.Message);
+                logger.LogError($"Exception in Listen(): {e.Message}");
             }
         }
 

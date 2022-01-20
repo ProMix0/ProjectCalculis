@@ -1,5 +1,6 @@
 ﻿using MainLibrary.Classes;
 using MainLibrary.Interfaces;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,11 +24,27 @@ namespace Server
             Server = server;
         }
 
+        private static Logger<ServerWork> staticLogger;
+        internal static void AddLogger(Logger<ServerWork> logger)
+        {
+            if (staticLogger == null)
+            {
+                staticLogger = logger;
+                staticLogger.LogInformation("Logger added");
+            }
+            else
+                staticLogger.LogWarning("Attempt to add new logger");
+        }
+
         internal static bool TryCreate(DirectoryInfo directory, out ServerWork outWork)
         {
             outWork = null;
 
-            if (!directory.Exists) return false;
+            if (!directory.Exists)
+            {
+                staticLogger.LogWarning($"Directory of {directory.Name} don't exists");
+                return false;
+            }
 
             IWork work = new Work(directory.Name, directory);
 
@@ -39,7 +56,11 @@ namespace Server
                 .GetExportedTypes()
                 .Where(type => type.IsAssignableTo(typeof(IServerCode)))
                 .First().FullName);
-            if (server == null) return false;
+            if (server == null)
+            {
+                staticLogger.LogWarning($"Can't create IServerCode from {fullName}");
+                return false;
+            }
 
             outWork = new(work, server);
             return true;
