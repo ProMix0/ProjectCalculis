@@ -12,16 +12,13 @@ namespace Client
 {
     public static class Extensions
     {
-        public static IHostBuilder AddClientModel(this IHostBuilder builder)
-        {
-            return builder.ConfigureServices((context, services) =>
-            {
-                services
-                    .Configure<PathOptions>(context.Configuration.GetSection(PathOptions.Path))
-                    .Configure<Options>(context.Configuration)
-                    .AddScoped<IRemoteServer, RemoteServer>()
-                    .AddSingleton<IClientModel, ClientModel>();
-            });
-        }
+        public static IHostBuilder AddClientModel(this IHostBuilder builder) => builder.ConfigureServices((context, services) =>
+             {
+                 services
+                     .Configure<PathOptions>(context.Configuration.GetSection(PathOptions.Path))
+                     .Configure<Options>(context.Configuration)
+                     .AddTransient<IRemoteServer, RemoteServer>()
+                     .AddSingleton<IClientModel, ClientModel>();
+             });
     }
 }

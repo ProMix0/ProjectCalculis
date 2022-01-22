@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using static System.Environment;
+using Microsoft.Extensions.Logging;
 
 namespace ClientShell
 {
@@ -36,6 +37,13 @@ namespace ClientShell
                 {
                     services.AddSingleton<MainWindow>();
                     services.AddSingleton<IViewModel, ViewModel>();
+                })
+                .ConfigureLogging((context, logging) =>
+                {
+                    logging
+
+                    .AddConfiguration(context.Configuration.GetSection("Logging"))
+                    .Add();
                 })
                 .AddClientModel()
                 .Build();
