@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    class ServerWork
+    public class ServerWork
     {
         public IWork Work { get; }
         public IWorkMetadata Metadata => Work.Metadata;
@@ -24,8 +24,8 @@ namespace Server
             Server = server;
         }
 
-        private static Logger<ServerWork> staticLogger;
-        internal static void AddLogger(Logger<ServerWork> logger)
+        private static ILogger<ServerWork> staticLogger;
+        internal static void AddLogger(ILogger<ServerWork> logger)
         {
             if (staticLogger == null)
             {

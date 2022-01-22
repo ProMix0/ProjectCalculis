@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    class Program
+    internal class Program
     {
-        static async Task Main(string[] args)
+        private static async Task Main(string[] args)
         {
             await new HostBuilder()
                 .ConfigureAppConfiguration(configHost =>
@@ -26,14 +26,20 @@ namespace Server
                 .ConfigureServices((context, services) =>
                 {
                     services
+
                     .Configure<ContractsOptions>(context.Configuration.GetSection(ContractsOptions.Path))
                     .Configure<PathOptions>(context.Configuration.GetSection(PathOptions.Path))
                     .Configure<Options>(context.Configuration)
+
+                    .AddTransient<IRemoteClientFactory, RemoteClientFactory>()
                     .AddHostedService<Worker>();
                 })
-                .ConfigureLogging(logging =>
+                .ConfigureLogging((context, logging) =>
                 {
-                    logging.AddConsole();
+                    logging
+
+                    .AddConfiguration(context.Configuration.GetSection("Logging"))
+                    .AddConsole();
                 })
                 .RunConsoleAsync();
         }

@@ -1,6 +1,9 @@
 ﻿{
   "Paths": {
-    "WorksDirectories": [ "C:\\Users\\Misha\\Desktop\\Works", "C:\\Users\\Ученик\\Documents\\ProjectCalculis" ]
+    "WorksDirectories": [
+      "C:\\Users\\Misha\\Desktop\\Works",
+      "C:\\Users\\Ученик\\Documents\\ProjectCalculis"
+    ]
   },
   "Contracts": {
     "GET": [
@@ -11,5 +14,10 @@
     "POST": [
       "ResultContract"
     ]
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information"
+    }
   }
 }

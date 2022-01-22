@@ -2,3 +2,6 @@
 
 # IDE0011: Добавить фигурные скобки
 csharp_prefer_braces = false
+
+# IDE0130: Пространство имен (namespace) не соответствует структуре папок.
+dotnet_style_namespace_match_folder = false

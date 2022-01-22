@@ -13,6 +13,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Server
 {
@@ -22,14 +23,15 @@ namespace Server
         private ContractsOptions contracts;
         private List<ServerWork> works = new();
         private IContractsCollection contractsCollection;
-        private readonly Logger<Worker> logger;
+        private readonly ILogger<Worker> logger;
+        private readonly IRemoteClientFactory clientFactory;
 
-        public Worker(IOptions<Options> options, Logger<Worker> logger, Logger<ServerWork> serverLogger)
+        public Worker(IOptions<Options> options, ILogger<Worker> logger, ILogger<ServerWork> serverLogger, IRemoteClientFactory clientFactory)
         {
             path = options.Value.Paths;
             contracts = options.Value.Contracts;
             this.logger = logger;
-
+            this.clientFactory = clientFactory;
             ServerWork.AddLogger(serverLogger);
         }
 
@@ -64,7 +66,7 @@ namespace Server
             logger.LogInformation("Listener started");
             while (true)
             {
-                IRemoteClient client = new RemoteClient(await listener.AcceptTcpClientAsync());
+                IRemoteClient client = clientFactory.New(await listener.AcceptTcpClientAsync());
                 client.SetContracts(contractsCollection);
             };
 
@@ -73,7 +75,7 @@ namespace Server
         private void AddContracts()
         {
             ContractsCollection collection = new();
-            foreach(var contractName in contracts.GET)
+            foreach (var contractName in contracts.GET)
             {
                 switch (contractName)
                 {
