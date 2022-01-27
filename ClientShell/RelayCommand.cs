@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,7 @@ namespace ClientShell
     public class RelayCommand : ICommand
     {
         private Action<object> execute;
+        private readonly ILogger logger;
         private Func<object, bool> canExecute;
 
         public event EventHandler CanExecuteChanged
@@ -18,19 +20,22 @@ namespace ClientShell
             remove { CommandManager.RequerySuggested -= value; }
         }
 
-        public RelayCommand(Action<object> execute, Func<object, bool> canExecute = null)
+        internal RelayCommand(Action<object> execute,ILogger logger, Func<object, bool> canExecute = null)
         {
             this.execute = execute;
+            this.logger = logger;
             this.canExecute = canExecute;
         }
 
         public bool CanExecute(object parameter)
         {
+            logger.LogDebug("CanExecute() called");
             return canExecute == null || canExecute(parameter);
         }
 
         public void Execute(object parameter)
         {
+            logger.LogDebug("Execute() called");
             execute(parameter);
         }
     }

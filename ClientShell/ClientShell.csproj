@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Client\Client.csproj" />
     <ProjectReference Include="..\MainLibrary\MainLibrary.csproj" />
+    <PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0-dev-00065"/>
   </ItemGroup>
 
 </Project>

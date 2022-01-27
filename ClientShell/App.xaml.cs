@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using static System.Environment;
 using Microsoft.Extensions.Logging;
+using Serilog.Extensions.Logging.File;
 
 namespace ClientShell
 {
@@ -35,15 +36,19 @@ namespace ClientShell
                 })
                 .ConfigureServices((context, services) =>
                 {
-                    services.AddSingleton<MainWindow>();
-                    services.AddSingleton<IViewModel, ViewModel>();
+                    services
+
+                    .AddSingleton<MainWindow>()
+                    .AddSingleton<IViewModel, ViewModel>()
+
+                    .AddHostedService<Worker>();
                 })
                 .ConfigureLogging((context, logging) =>
                 {
                     logging
 
                     .AddConfiguration(context.Configuration.GetSection("Logging"))
-                    .Add();
+                    .AddFile("Logs/log-{Date}.txt");
                 })
                 .AddClientModel()
                 .Build();
