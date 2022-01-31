@@ -40,6 +40,7 @@ namespace ClientShell
 
                     .AddSingleton<MainWindow>()
                     .AddSingleton<IViewModel, ViewModel>()
+                    .AddSingleton<IRelayCommandFactory, RelayCommandFactory>()
 
                     .AddHostedService<Worker>();
                 })

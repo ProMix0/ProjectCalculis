@@ -10,7 +10,7 @@ namespace ClientShell
 {
     public class RelayCommand : ICommand
     {
-        private Action<object> execute;
+        private Action<object, ILogger> execute;
         private readonly ILogger logger;
         private Func<object, bool> canExecute;
 
@@ -20,7 +20,7 @@ namespace ClientShell
             remove { CommandManager.RequerySuggested -= value; }
         }
 
-        internal RelayCommand(Action<object> execute,ILogger logger, Func<object, bool> canExecute = null)
+        internal RelayCommand(Action<object, ILogger> execute, ILogger logger, Func<object, bool> canExecute = null)
         {
             this.execute = execute;
             this.logger = logger;
@@ -36,7 +36,7 @@ namespace ClientShell
         public void Execute(object parameter)
         {
             logger.LogDebug("Execute() called");
-            execute(parameter);
+            execute(parameter, logger);
         }
     }
 }

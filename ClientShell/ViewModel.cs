@@ -10,23 +10,24 @@ namespace ClientShell
     public class ViewModel : IViewModel
     {
 
-        public ViewModel(IClientModel model, ILogger<ViewModel> logger)
+        public ViewModel(IClientModel model, ILogger<ViewModel> logger, IRelayCommandFactory commandFactory)
         {
             this.model = model;
             this.logger = logger;
-            ExecuteCommand = new(async parameter =>
-                                {
-                                    if (parameter is IWorkMetadata metadata)
-                                    {
-                                        CanExecuteWork = false;
-                                        logger.LogDebug("Before work executing");
-                                        await model.Execute(metadata);
-                                        CanExecuteWork = true;
-                                    }
-                                    else
-                                        logger.LogWarning("Parameter isn't IWorkMetadata");
-                                },
-                                 parameter => parameter != null && CanExecuteWork);//TODO Fix using RelayCommandFactory
+            ExecuteCommand = commandFactory.New(async (parameter, logger) =>
+                                 {
+                                     if (parameter is IWorkMetadata metadata)
+                                     {
+                                         CanExecuteWork = false;
+                                         logger.LogDebug("Before work executing");
+                                         await model.Execute(metadata);
+                                         CanExecuteWork = true;
+                                     }
+                                     else
+                                         logger.LogWarning("Parameter isn't IWorkMetadata");
+                                 },
+                                 parameter => parameter != null && CanExecuteWork,
+                                "Work executing button");
         }
 
         private IClientModel model;

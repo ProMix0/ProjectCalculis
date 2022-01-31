@@ -8,18 +8,16 @@ using System.Threading.Tasks;
 
 namespace ClientShell
 {
-    class RelayCommandFactory
+    class RelayCommandFactory : IRelayCommandFactory
     {
         private readonly ILoggerFactory loggerFactory;
 
-        public RelayCommandFactory(IServiceProvider provider)
+        public RelayCommandFactory(ILoggerFactory loggerFactory)
         {
-            loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+            this.loggerFactory = loggerFactory;
         }
 
-        public RelayCommand New(Action<object> execute, string category = null, Func<object, bool> canExecute = null)
-        {
-            return new(execute, loggerFactory.CreateLogger(category is not null ? category : nameof(RelayCommand)), canExecute);
-        }
+        public RelayCommand New(Action<object, ILogger> execute, Func<object, bool> canExecute = null, string category = null) =>
+            new(execute, loggerFactory.CreateLogger($"{nameof(RelayCommand)}{(string.IsNullOrEmpty(category) ? "" : $": {category}")}"), canExecute);
     }
 }
