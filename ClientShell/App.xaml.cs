@@ -29,6 +29,7 @@ namespace ClientShell
                 .ConfigureAppConfiguration(configHost =>
                 {
                     configHost
+
                     .SetBasePath(Directory.GetCurrentDirectory())
                     .AddInMemoryCollection(new Dictionary<string, string>() { { "Path:WorksDirectory", $@"{GetFolderPath(SpecialFolder.ApplicationData)}\ProjectCalculis\Works" } })
                     .AddJsonFile(GetFolderPath(SpecialFolder.ApplicationData) + @"\ProjectCalculis\settings.json", optional: true)
@@ -37,6 +38,8 @@ namespace ClientShell
                 .ConfigureServices((context, services) =>
                 {
                     services
+
+                    .AddClientModel(context)
 
                     .AddSingleton<MainWindow>()
                     .AddSingleton<IViewModel, ViewModel>()
@@ -51,7 +54,6 @@ namespace ClientShell
                     .AddConfiguration(context.Configuration.GetSection("Logging"))
                     .AddFile("Logs/log-{Date}.txt");
                 })
-                .AddClientModel()
                 .Build();
         }
 

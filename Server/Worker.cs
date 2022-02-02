@@ -25,13 +25,15 @@ namespace Server
         private IContractsCollection contractsCollection;
         private readonly ILogger<Worker> logger;
         private readonly IRemoteClientFactory clientFactory;
+        private readonly ILoggerFactory loggerFactory;
 
-        public Worker(IOptions<Options> options, ILogger<Worker> logger, ILogger<ServerWork> serverLogger, IRemoteClientFactory clientFactory)
+        public Worker(IOptions<Options> options, ILogger<Worker> logger, ILogger<ServerWork> serverLogger, IRemoteClientFactory clientFactory, ILoggerFactory loggerFactory)
         {
             path = options.Value.Paths;
             contracts = options.Value.Contracts;
             this.logger = logger;
             this.clientFactory = clientFactory;
+            this.loggerFactory = loggerFactory;
             ServerWork.AddLogger(serverLogger);
         }
 
@@ -80,15 +82,18 @@ namespace Server
                 switch (contractName)
                 {
                     case nameof(ArgsContract):
-                        collection.Add(new ArgsContract(args => works.Find(work => work.Name.Equals(args["name"])).Server.GetArgument()));
+                        collection.Add(new ArgsContract(args => works.Find(work => work.Name.Equals(args["name"])).Server.GetArgument())
+                            .AddLogger(loggerFactory.CreateLogger<ArgsContract>()));
                         logger.LogInformation($"{nameof(ArgsContract)} added");
                         break;
                     case nameof(MetadataContract):
-                        collection.Add(new MetadataContract(_ => works.Select(work => work.Metadata).ToList()));
+                        collection.Add(new MetadataContract(_ => works.Select(work => work.Metadata).ToList())
+                            .AddLogger(loggerFactory.CreateLogger<MetadataContract>()));
                         logger.LogInformation($"{nameof(MetadataContract)} added");
                         break;
                     case nameof(WorkContract):
-                        collection.Add(new WorkContract(args => works.Find(work => work.Name.Equals(args["name"])).Work));
+                        collection.Add(new WorkContract(args => works.Find(work => work.Name.Equals(args["name"])).Work)
+                            .AddLogger(loggerFactory.CreateLogger<WorkContract>()));
                         logger.LogInformation($"{nameof(WorkContract)} added");
                         break;
                     default:
@@ -101,7 +106,8 @@ namespace Server
                 switch (contractName)
                 {
                     case nameof(ResultContract):
-                        collection.Add(new ResultContract((result, args) => works.Find(work => work.Name.Equals(args["name"])).Server.SetResult(result)));
+                        collection.Add(new ResultContract((result, args) => works.Find(work => work.Name.Equals(args["name"])).Server.SetResult(result))
+                            .AddLogger(loggerFactory.CreateLogger<ResultContract>()));
                         logger.LogInformation($"{nameof(ResultContract)} added");
                         break;
                     default:

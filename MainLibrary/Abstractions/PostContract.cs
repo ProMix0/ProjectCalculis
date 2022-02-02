@@ -1,4 +1,5 @@
 ﻿using MainLibrary.Interfaces;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace MainLibrary.Abstractions
 {
-    public abstract class PostContract<T> : TransferContract,IPostContract
+    public abstract class PostContract<T> : TransferContract, IPostContract
         where T : class
     {
         private readonly Action<T, Dictionary<string, string>> onReceive;
@@ -21,17 +22,25 @@ namespace MainLibrary.Abstractions
 
         public async Task ReceiveData(Stream stream)
         {
-            if (ConnectionSide != ConnectionSideEnum.Server) throw new InvalidOperationException();
+            if (ConnectionSide != ConnectionSideEnum.Server)
+            {
+                logger?.LogError($"Can't call {nameof(ReceiveData)} due to it isn't server side");
+                throw new InvalidOperationException();
+            }
 
             T data = await ReceiveData(new BinaryReader(stream, Encoding.UTF8, true));
-            onReceive?.Invoke(data,Args);
+            onReceive?.Invoke(data, Args);
         }
 
         protected abstract Task<T> ReceiveData(BinaryReader reader);
 
-        public Task SendData(Stream stream,T data, Dictionary<string,string> args)
+        public Task SendData(Stream stream, T data, Dictionary<string, string> args)
         {
-            if (ConnectionSide != ConnectionSideEnum.Client) throw new InvalidOperationException();
+            if (ConnectionSide != ConnectionSideEnum.Client)
+            {
+                logger?.LogError($"Can't call {nameof(SendData)} due to it isn't server side");
+                throw new InvalidOperationException();
+            }
 
             using BinaryReader reader = new(stream, Encoding.UTF8, true);
             using BinaryWriter writer = new(stream, Encoding.UTF8, true);

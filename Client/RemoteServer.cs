@@ -1,5 +1,6 @@
 ﻿using MainLibrary.Classes;
 using MainLibrary.Interfaces;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -25,14 +26,14 @@ namespace Client
         private ResultContract resultContract;
         private ArgsContract argsContract;
 
-        public RemoteServer(IOptions<PathOptions> options)
+        public RemoteServer(IOptions<PathOptions> options, ILoggerFactory loggerFactory)
         {
             worksDirectory = new(options.Value.WorksDirectory);
 
-            workContract = new(worksDirectory);
-            metadataContract = new();
-            resultContract = new();
-            argsContract = new();
+            workContract = new WorkContract(worksDirectory).AddLogger(loggerFactory.CreateLogger<WorkContract>());
+            metadataContract = new MetadataContract().AddLogger(loggerFactory.CreateLogger<MetadataContract>());
+            resultContract = new ResultContract().AddLogger(loggerFactory.CreateLogger<ResultContract>());
+            argsContract = new ArgsContract().AddLogger(loggerFactory.CreateLogger<ArgsContract>());
         }
 
         public void ConnectTo(IPEndPoint endPoint)
@@ -70,12 +71,12 @@ namespace Client
 
         public Task<IWork> DownloadWork(IWorkMetadata workMetadata)
         {
-            return workContract.RequestData(stream,new(){ { "name", workMetadata.Name } });
+            return workContract.RequestData(stream, new() { { "name", workMetadata.Name } });
         }
 
         public Task<byte[]> GetArgs(IWorkMetadata metadata)
         {
-            return argsContract.RequestData(stream,new(){ { "name", metadata.Name } });
+            return argsContract.RequestData(stream, new() { { "name", metadata.Name } });
         }
 
         public Task<List<IWorkMetadata>> GetWorksList()
@@ -85,7 +86,7 @@ namespace Client
 
         public Task SendWorkResult(IWorkMetadata metadata, byte[] result)
         {
-            return resultContract.SendData(stream, result, new(){ { "name", metadata.Name } });
+            return resultContract.SendData(stream, result, new() { { "name", metadata.Name } });
         }
     }
 }

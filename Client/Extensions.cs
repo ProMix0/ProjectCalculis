@@ -12,13 +12,12 @@ namespace Client
 {
     public static class Extensions
     {
-        public static IHostBuilder AddClientModel(this IHostBuilder builder) => builder.ConfigureServices((context, services) =>
-             {
-                 services
+        public static IServiceCollection AddClientModel(this IServiceCollection collection, HostBuilderContext context) => 
+            collection
                      .Configure<PathOptions>(context.Configuration.GetSection(PathOptions.Path))
                      .Configure<Options>(context.Configuration)
                      .AddTransient<IRemoteServer, RemoteServer>()
                      .AddSingleton<IClientModel, ClientModel>();
-             });
+             
     }
 }

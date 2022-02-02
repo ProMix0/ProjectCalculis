@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace MainLibrary.Abstractions
 {
@@ -21,7 +22,11 @@ namespace MainLibrary.Abstractions
 
         public Task<T> RequestData(Stream stream, Dictionary<string, string> args)
         {
-            if (ConnectionSide != ConnectionSideEnum.Client) throw new InvalidOperationException();
+            if (ConnectionSide != ConnectionSideEnum.Client)
+            {
+                logger?.LogError($"Can't call {nameof(RequestData)} due to it isn't client side");
+                throw new InvalidOperationException();
+            }
             args ??= new();
             Args = args;
 
@@ -42,7 +47,11 @@ namespace MainLibrary.Abstractions
 
         public Task SendData(Stream stream)
         {
-            if (ConnectionSide != ConnectionSideEnum.Server) throw new InvalidOperationException();
+            if (ConnectionSide != ConnectionSideEnum.Server)
+            {
+                logger?.LogError($"Can't call {nameof(SendData)} due to it isn't server side");
+                throw new InvalidOperationException();
+            }
 
             using BinaryWriter writer = new(stream, Encoding.UTF8, true);
             return SendData(writer, onSend?.Invoke(Args));
