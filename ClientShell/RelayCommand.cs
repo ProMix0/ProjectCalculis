@@ -16,9 +16,19 @@ namespace ClientShell
 
         public event EventHandler CanExecuteChanged
         {
-            add { CommandManager.RequerySuggested += value; }
-            remove { CommandManager.RequerySuggested -= value; }
+            add
+            {
+                CommandManager.RequerySuggested += value;
+                canExecuteChanged += value;
+            }
+            remove
+            {
+                CommandManager.RequerySuggested -= value;
+                canExecuteChanged -= value;
+            }
         }
+
+        private event EventHandler canExecuteChanged;
 
         internal RelayCommand(Action<object, ILogger> execute, ILogger logger, Func<object, bool> canExecute = null)
         {
@@ -31,6 +41,11 @@ namespace ClientShell
         {
             logger.LogDebug("CanExecute() called");
             return canExecute == null || canExecute(parameter);
+        }
+
+        public void OnCanExecuteChanged()
+        {
+            canExecuteChanged(this, new());
         }
 
         public void Execute(object parameter)

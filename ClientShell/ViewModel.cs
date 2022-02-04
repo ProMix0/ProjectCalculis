@@ -37,10 +37,11 @@ namespace ClientShell
 
                 if (parameter is IWorkMetadata metadata)
                 {
-                     lock (canExecuteLock) CanExecuteWork = false;
+                    CanExecuteWork = false;
                     logger.LogDebug("Before work executing");
                     await model.Execute(metadata);
-                    lock (canExecuteLock) CanExecuteWork = true;
+                    CanExecuteWork = true;
+                    ExecuteCommand.OnCanExecuteChanged();
                 }
                 else
                     logger.LogWarning("Parameter isn't IWorkMetadata");
@@ -56,7 +57,7 @@ namespace ClientShell
             if (looping)
             {
                 tokenSource = new();
-                await (tempTask=Task.Run(async () =>
+                await Task.Run(async () =>
                  {
                      CancellationToken token = tokenSource.Token;
                      while (true)
@@ -64,7 +65,7 @@ namespace ClientShell
                          if (token.IsCancellationRequested) return;
                          await Execute(parameter, logger);
                      }
-                 }));
+                 });
             }
             else
             {
@@ -72,15 +73,12 @@ namespace ClientShell
                 tokenSource.Dispose();
             }
         }
-        Task tempTask;
 
         private bool looping = false;
         private CancellationTokenSource tokenSource;
 
         private IClientModel model;
         private readonly ILogger<ViewModel> logger;
-
-        private object canExecuteLock=new();
 
         public override IReadOnlyCollection<IWorkMetadata> Metadatas => model.WorksMetas;
 
