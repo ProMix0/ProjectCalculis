@@ -28,13 +28,13 @@ namespace MainLibrary.Abstractions
                 throw new InvalidOperationException();
             }
 
-            T data = await ReceiveData(new BinaryReader(stream, Encoding.UTF8, true));
+            T data = await ReceiveDataInner(stream);
             onReceive?.Invoke(data, Args);
         }
 
-        protected abstract Task<T> ReceiveData(BinaryReader reader);
+        protected abstract Task<T> ReceiveDataInner(Stream stream);
 
-        public Task SendData(Stream stream, T data, Dictionary<string, string> args)
+        public async Task SendData(Stream stream, T data, Dictionary<string, string> args)
         {
             if (ConnectionSide != ConnectionSideEnum.Client)
             {
@@ -47,10 +47,10 @@ namespace MainLibrary.Abstractions
             string request = requestTemplate;
             foreach (var arg in args)
                 request = request.Replace(arg.Key, arg.Value);
-            writer.Write($"POST {request}");
-            return SendData(writer, data);
+            await stream.WriteAsync(Encoding.Default.GetBytes($"POST {request}"));
+            await SendDataInner(stream, data);
         }
 
-        protected abstract Task SendData(BinaryWriter writer, T data);
+        protected abstract Task SendDataInner(Stream stream, T data);
     }
 }

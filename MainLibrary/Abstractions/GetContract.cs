@@ -20,7 +20,7 @@ namespace MainLibrary.Abstractions
             this.onSend = onSend;
         }
 
-        public Task<T> RequestData(Stream stream, Dictionary<string, string> args)
+        public async Task<T> RequestData(Stream stream, Dictionary<string, string> args)
         {
             if (ConnectionSide != ConnectionSideEnum.Client)
             {
@@ -30,20 +30,14 @@ namespace MainLibrary.Abstractions
             args ??= new();
             Args = args;
 
-            BinaryReader reader = new(stream, Encoding.UTF8, true);
-            using BinaryWriter writer = new(stream, Encoding.UTF8, true);
             string request = requestTemplate;
             foreach (var arg in args)
                 request = request.Replace(arg.Key, arg.Value);
-            writer.Write($"GET {request}");
-            return ReceiveData(reader).ContinueWith(task =>
-            {
-                reader.Dispose();
-                return task.Result;
-            });
+            await stream.WriteAsync(Encoding.Default.GetBytes( $"GET {request}"));
+            return await ReceiveDataInner(stream);
         }
 
-        protected abstract Task<T> ReceiveData(BinaryReader reader);
+        protected abstract Task<T> ReceiveDataInner(Stream stream);
 
         public Task SendData(Stream stream)
         {
@@ -53,10 +47,9 @@ namespace MainLibrary.Abstractions
                 throw new InvalidOperationException();
             }
 
-            using BinaryWriter writer = new(stream, Encoding.UTF8, true);
-            return SendData(writer, onSend?.Invoke(Args));
+            return SendDataInner(stream, onSend?.Invoke(Args));
         }
 
-        protected abstract Task SendData(BinaryWriter writer, T data);
+        protected abstract Task SendDataInner(Stream stream, T data);
     }
 }

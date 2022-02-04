@@ -23,9 +23,11 @@ namespace MainLibrary.Classes
             AsClient();
         }
 
-        protected override Task<List<IWorkMetadata>> ReceiveData(BinaryReader reader)
+        protected override async Task<List<IWorkMetadata>> ReceiveDataInner(Stream stream)
         {
-            int count = reader.ReadInt32();
+            byte[] input = new byte[4];
+            await stream.ReadAsync(input);
+            int count = BitConverter.ToInt32(input);
             List<IWorkMetadata> result = new();
             for (int i = 0; i < count; i++)
             {
@@ -36,7 +38,7 @@ namespace MainLibrary.Classes
             return Task.FromResult(result);
         }
 
-        protected override Task SendData(BinaryWriter writer, List<IWorkMetadata> data)
+        protected override Task SendDataInner(Stream stream, List<IWorkMetadata> data)
         {
             writer.Write(data.Count);
             foreach (var metadata in data)
