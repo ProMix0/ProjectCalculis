@@ -69,9 +69,9 @@ namespace Client
             client.Dispose();
         }
 
-        public Task<IWork> DownloadWork(IWorkMetadata workMetadata)
+        public Task<IWork> DownloadWork(IWorkMetadata metadata)
         {
-            return workContract.RequestData(stream, new() { { "name", workMetadata.Name } });
+            return workContract.RequestData(stream, new() { { "name", metadata.Name } });
         }
 
         public Task<byte[]> GetArgs(IWorkMetadata metadata)

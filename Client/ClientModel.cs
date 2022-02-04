@@ -45,15 +45,18 @@ namespace Client
         public async Task Execute(IWorkMetadata metadata)
         {
             logger.LogDebug($"Calling {nameof(Execute)}()");
-            IWork work = await GetWork(metadata);
-            byte[] args = await server.GetArgs(metadata);
-            byte[] result = await work.Execute(args);
-            await server.SendWorkResult(metadata, result);
+
+            Task<IWork> workTask= GetWork(metadata);
+            Task<byte[]> argsTask = server.GetArgs(metadata);
+
+            Task<byte[]> resultTask = (await workTask).Execute(await argsTask);
+
+            await server.SendWorkResult(metadata, await resultTask);
         }
 
         private async Task<IWork> GetWork(IWorkMetadata metadata)
         {
-            logger.LogDebug($"Calling {nameof(GetWork)}()");
+            logger.LogDebug($"Getting {nameof(GetWork)}()");
             if (works == null)
                 works = Work.CreateWorksFrom(worksDirectory);
             IWork work = works.Find(work => work.Name.Equals(metadata.Name));
