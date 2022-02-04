@@ -60,8 +60,8 @@ namespace Client
             if (work == null || !work.Metadata.Equals(metadata))
             {
                 worksDirectory.CreateSubdirectory(metadata.Name).Delete(true);
-                work = await server.DownloadWork(metadata);
                 works.Remove(work);
+                work = await server.DownloadWork(metadata);
                 works.Add(work);
             }
             return work;

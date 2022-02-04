@@ -5,12 +5,14 @@ using Client;
 using System.Windows.Input;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
+using System.ComponentModel;
+using System.Threading;
 
 namespace ClientShell
 {
-    public class ViewModel : IViewModel
+    public class ViewModel : AbstractViewModel
     {
-
         public ViewModel(IClientModel model, ILogger<ViewModel> logger, IRelayCommandFactory commandFactory)
         {
             this.model = model;
@@ -19,7 +21,8 @@ namespace ClientShell
                                                 parameter => parameter != null && CanExecuteWork,
                                                 "Work executing button");
             LoopCommand = commandFactory.New(async (parameter, logger) => await LoopExecuting(parameter, logger),
-                                             category: "Loop executing button");
+                                             parameter => parameter != null,
+                                             "Loop executing button");
         }
 
         private async Task Execute(object parameter, ILogger logger)
@@ -34,44 +37,53 @@ namespace ClientShell
 
                 if (parameter is IWorkMetadata metadata)
                 {
-                    CanExecuteWork = false;
+                     lock (canExecuteLock) CanExecuteWork = false;
                     logger.LogDebug("Before work executing");
                     await model.Execute(metadata);
-                    CanExecuteWork = true;
+                    lock (canExecuteLock) CanExecuteWork = true;
                 }
                 else
                     logger.LogWarning("Parameter isn't IWorkMetadata");
             }
             finally
             {
-                CanExecuteWork = true;
             }
         }
 
         private async Task LoopExecuting(object parameter, ILogger logger)
         {
             looping = !looping;
-            if (looping && (loopTask == null || !loopTask.IsCompleted))
-                await (loopTask = Task.Run(async () =>
+            if (looping)
+            {
+                tokenSource = new();
+                await (tempTask=Task.Run(async () =>
                  {
-                     while (looping)
+                     CancellationToken token = tokenSource.Token;
+                     while (true)
                      {
+                         if (token.IsCancellationRequested) return;
                          await Execute(parameter, logger);
                      }
                  }));
+            }
+            else
+            {
+                tokenSource.Cancel();
+                tokenSource.Dispose();
+            }
         }
+        Task tempTask;
 
         private bool looping = false;
-        private Task loopTask;
+        private CancellationTokenSource tokenSource;
 
         private IClientModel model;
         private readonly ILogger<ViewModel> logger;
 
-        public IReadOnlyCollection<IWorkMetadata> Metadatas => model.WorksMetas;
+        private object canExecuteLock=new();
 
-        public RelayCommand ExecuteCommand { get; }
-        public RelayCommand LoopCommand { get; }
+        public override IReadOnlyCollection<IWorkMetadata> Metadatas => model.WorksMetas;
 
-        public bool CanExecuteWork { get; set; } = true;
+        
     }
 }

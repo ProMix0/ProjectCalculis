@@ -23,8 +23,9 @@ namespace TestWork
         public void SetResult(byte[] result)
         {
             Console.Write("Receive result:");
-            foreach (var n in result.Concat("\n\r".Cast<byte>()))
+            foreach (var n in result)
                 Console.Write($" {n}");
+            Console.WriteLine();
         }
 
         public byte[] GetArgument()

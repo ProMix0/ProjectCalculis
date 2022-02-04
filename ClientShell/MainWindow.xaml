@@ -30,8 +30,8 @@
             <Grid.RowDefinitions>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <Button Content="Execute" Command="{Binding ExecuteCommand}" CommandParameter="{Binding ElementName=listView,Path=SelectedItem}" IsEnabled="{Binding CanExecuteWork}"/>
-            <Button Grid.Column="1" Content="Auto" Command="{Binding LoopCommand}"/>
+            <Button Content="Execute" Command="{Binding ExecuteCommand}" CommandParameter="{Binding ElementName=listView,Path=SelectedItem}"/>
+            <Button Grid.Column="1" Content="Auto" Command="{Binding LoopCommand}" CommandParameter="{Binding ElementName=listView,Path=SelectedItem}"/>
         </Grid>
         <StackPanel Grid.Row="1" Grid.Column="1" DataContext="{Binding ElementName=listView,Path=SelectedItem}">
             <TextBlock Text="{Binding Name}"/>
