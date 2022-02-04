@@ -20,7 +20,7 @@ namespace Server
 
         public IRemoteClient New(TcpClient client)
         {
-            return new RemoteClient(client, serviceProvider.GetRequiredService<Logger<RemoteClient>>());
+            return new RemoteClient(client, serviceProvider.GetRequiredService<ILogger<RemoteClient>>());
         }
     }
 }

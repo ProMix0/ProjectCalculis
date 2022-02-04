@@ -28,10 +28,10 @@ namespace Server
         private BinaryReader reader;
         //private BinaryWriter writer;
         private TcpClient client;
-        private readonly Logger<RemoteClient> logger;
+        private readonly ILogger<RemoteClient> logger;
         private IContractsCollection contracts;
 
-        public RemoteClient(TcpClient client, Logger<RemoteClient> logger)
+        public RemoteClient(TcpClient client, ILogger<RemoteClient> logger)
         {
             this.client = client;
             this.logger = logger;
