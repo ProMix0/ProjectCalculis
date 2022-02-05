@@ -39,6 +39,7 @@ namespace Server
                     logging
 
                     .AddConfiguration(context.Configuration.GetSection("Logging"))
+                    .AddFile("Logs/log-{Date}.txt")
                     .AddConsole();
                 })
                 .RunConsoleAsync();
